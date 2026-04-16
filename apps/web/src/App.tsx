@@ -8,6 +8,7 @@ import AuthPage from './pages/auth/index';
 import BuilderPage from './pages/builder/[faction]';
 import ListPage from './pages/list/[id]';
 import ProfilePage from './pages/profile';
+import CommunityPage from './pages/community';
 import SharePage from './pages/share/[token]';
 
 const queryClient = new QueryClient({
@@ -54,6 +55,7 @@ export default function App() {
               path="/profile"
               element={<AuthGate><ProfilePage /></AuthGate>}
             />
+            <Route path="/community" element={<CommunityPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
