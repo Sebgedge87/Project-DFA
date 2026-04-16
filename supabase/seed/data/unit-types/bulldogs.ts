@@ -1,0 +1,130 @@
+export const bulldogsUnitTypes = [
+  {
+    faction_slug: 'bulldogs',
+    name: 'The Red Devil',
+    role: 'captain',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 124, max_per_army: 1, base_size_mm: 25, sort_order: 1,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'Inspiring Presence', description: 'When this Model Activates, other Friendly Models within 6" may remove 1 Stress.' },
+      { name: "Killer's Instinct", description: 'This Model may re-roll any of its Melee Attack rolls.' },
+      { name: 'Who Dares Wins', description: 'Models in this team ignore the Stress Modifier to their Movement stat.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Master of The Line',
+    role: 'captain',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 103, max_per_army: 1, base_size_mm: 25, sort_order: 2,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'On My Mark!', description: 'Friendly Models within 4" may re-roll one Ranged Attack die per Action.' },
+      { name: 'Old Hand', description: 'This Model counts as having 1 less Stress.' },
+      { name: 'Volley Fire!', description: 'Models in this team gain +1 Attack during Ranged Attacks when within 2" of a Friendly Model. Additionally Models in this team do not receive Stress from making a Fire Back Reaction.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'The Old Sweat',
+    role: 'captain',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 115, max_per_army: 1, base_size_mm: 25, sort_order: 3,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'Veteran', description: 'This Model may re-roll one die in their Attack rolls and Defence rolls.' },
+      { name: 'Keep Moving!', description: 'Friendly Models that Activate within 4" of this Model may add 2" to their Movement.' },
+      { name: 'Stiff Upper Lip', description: 'At the start of their Activation, Models in this team may remove 1 Stress. When a Model in this Team makes a Recover Action they roll 2 d5 and select the highest result.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'L.M.G. Gunner',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 95, max_per_army: 2, base_size_mm: 25, sort_order: 4,
+    abilities: [
+      { name: 'Saturated Fire', description: 'May re-roll any Ranged Attack die. If you choose to re-roll any dice, at the end of the Action this model receives 1 Stress.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Grenadier',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 96, max_per_army: 2, base_size_mm: 25, sort_order: 5,
+    abilities: [
+      { name: 'Buckshee Ammo', description: 'May re-roll one failed Ranged Attack Dice per Ranged Attack.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Electro Gunner',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 93, max_per_army: 2, base_size_mm: 25, sort_order: 6,
+    abilities: [],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Whistler',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 105, max_per_army: 2, base_size_mm: 25, sort_order: 7,
+    abilities: [
+      { name: 'On the Boil', description: 'This Model may ignore the Slow Keyword. If this Model performs two Ranged Attack Actions it gains +1 Stress.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Commando',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 95, max_per_army: null, base_size_mm: 25, sort_order: 8,
+    abilities: [
+      { name: 'Cool in Cover', description: 'This Model gains +1 to their Ranged Attack rolls when in Cover.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Rifleman',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 93, max_per_army: null, base_size_mm: 25, sort_order: 9,
+    abilities: [
+      { name: 'In the Line', description: 'This Model ignores the Stress Modifier to Ranged Attack rolls when within 2" of another Friendly Model.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Tommy',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 94, max_per_army: null, base_size_mm: 25, sort_order: 10,
+    abilities: [
+      { name: 'Pepper Potting', description: 'When this Model performs a Ranged Attack Action they may make a free 2" Move at the end of the Action. Must follow all of the usual rules for Move Actions.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Brew Sgt.',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 95, max_per_army: 2, base_size_mm: 25, sort_order: 11,
+    abilities: [
+      { name: 'Built on Tea', description: 'Friendly Models that Activate within 4" of this Model may remove 1 Stress at the start of their Activation.' },
+      { name: 'Cuppa?', description: 'Action: Any Friendly Model in base contact with this Model, including this Model, may perform this Action. Remove all Stress from this Model.' },
+    ],
+  },
+  {
+    faction_slug: 'bulldogs',
+    name: 'Combat Medic',
+    role: 'core',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 95, max_per_army: 2, base_size_mm: 25, sort_order: 12,
+    abilities: [
+      { name: 'Medic!', description: 'Action: This model or a model in base contact may heal d5 wounds.' },
+    ],
+  },
+];
