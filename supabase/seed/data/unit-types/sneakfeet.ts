@@ -1,0 +1,106 @@
+export const sneakfeetUnitTypes = [
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Quiet-flinger',
+    role: 'captain',
+    actions: 3, movement: 6, melee_attack: 7, ranged_attack: 3, defence: 6, health: 5,
+    points: 116, max_per_army: 1, base_size_mm: 25, sort_order: 1,
+    abilities: [
+      { name: 'Shirif', description: 'This Model has the Order Keyword.' },
+      { name: 'Marksman', description: 'This model ignores the -1 modifier when not targeting the closest enemy model with a Ranged Attack.' },
+      { name: 'Unseen Marksmen', description: 'All Models in this Team gain a +1 to Defence Rolls when selected as the target of a Ranged Attack from over 12" away.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Hardfoot',
+    role: 'captain',
+    actions: 3, movement: 6, melee_attack: 6, ranged_attack: 5, defence: 6, health: 5,
+    points: 105, max_per_army: 1, base_size_mm: 25, sort_order: 2,
+    abilities: [
+      { name: 'Shirif', description: 'This Model has the Order Keyword.' },
+      { name: 'Slippery', description: '8+ Shield Save against Ranged and Melee Attacks only.' },
+      { name: 'Slight of Stature', description: 'Attacks that target models in this Team always suffer an additional -1 modifier to their Attack Rolls.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Grass-whistler',
+    role: 'specialist',
+    actions: 2, movement: 6, melee_attack: 7, ranged_attack: 3, defence: 6, health: 5,
+    points: 108, max_per_army: 4, base_size_mm: 25, sort_order: 3,
+    abilities: [
+      { name: 'Marksman', description: 'This model ignores the -1 modifier when not targeting the closest enemy model with a Ranged Attack.' },
+      { name: 'Concealed Position', description: 'This Model receives an additional +1 to Defence Rolls when benefiting from Cover.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Bombarder',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 7, ranged_attack: 5, defence: 6, health: 5,
+    points: 102, max_per_army: 4, base_size_mm: 25, sort_order: 4,
+    abilities: [
+      { name: "Bag o' Bombs!", description: 'This Model may re-roll its Ranged Attack Dice when making a Ranged Attack with Frag Grenades.' },
+      { name: 'Slippery', description: '8+ Shield Save against Ranged and Melee Attacks only.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Pointfoot',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 7, ranged_attack: 5, defence: 6, health: 5,
+    points: 88, max_per_army: 2, base_size_mm: 25, sort_order: 5,
+    abilities: [
+      { name: 'Binoculars', description: 'All Friendly Models within 4" of this model gain +1 to their ranged attack rolls.' },
+      { name: 'Comms', description: 'A Captain may issue an order to models within 6" of this model following all of the rules for issuing orders.' },
+      { name: 'Concealed Position', description: 'This Model receives an additional +1 to Defence Rolls when benefiting from Cover.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Cook',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 106, max_per_army: 2, base_size_mm: 25, sort_order: 6,
+    abilities: [
+      { name: 'A Hearty Meal', description: 'Friendly Models that activate within 6" of this model may remove 1 stress at the start of their Activation.' },
+      { name: 'Second Breakfast', description: 'Friendly Models that activate within 4" of this model may remove 1 Damage at the start of their Activation.' },
+      { name: 'Slippery', description: '8+ Shield Save against Ranged and Melee Attacks only.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Quickfoot',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 6, health: 5,
+    points: 95, max_per_army: null, base_size_mm: 25, sort_order: 7,
+    abilities: [
+      { name: 'Light Footed', description: 'This Model ignores the effects of Difficult Ground.' },
+      { name: 'Fast Hands', description: 'This Model may re-roll one failed Attack roll per Attack Action.' },
+      { name: 'Slippery', description: '8+ Shield Save against Ranged and Melee Attacks only.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Youngfoot',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 7, ranged_attack: 5, defence: 6, health: 5,
+    points: 85, max_per_army: null, base_size_mm: 25, sort_order: 8,
+    abilities: [
+      { name: "Beginner's Luck", description: 'When this model receives damage roll a d10 and call "odds" or "evens". If correct, reduce the damage received to 1.' },
+      { name: 'Enthusiastic', description: 'This Model may re-roll any of their Ranged Attack dice.' },
+    ],
+  },
+  {
+    faction_slug: 'sneakfeet',
+    name: 'Stoutfoot',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 7, ranged_attack: 5, defence: 5, health: 5,
+    points: 91, max_per_army: null, base_size_mm: 25, sort_order: 9,
+    abilities: [
+      { name: 'Stubborn', description: "At the beginning of this Model's activation you may remove 1 Stress from this Model." },
+      { name: 'Slippery', description: '8+ Shield Save against Ranged and Melee Attacks only.' },
+    ],
+  },
+];
