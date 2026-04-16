@@ -1,0 +1,110 @@
+export const oohRahUnitTypes = [
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Lieutenant',
+    role: 'captain',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 4, health: 5,
+    points: 108, max_per_army: 1, base_size_mm: 25, sort_order: 1,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'Semper-Fi!', description: 'When this Model Activates, Friendly models within 6" may remove 1 Stress.' },
+      { name: 'Target Overlay', description: 'Friendly Models within 6" ignore Intervening Terrain modifier during Ranged Attack Actions.' },
+      { name: 'Leathernecks', description: 'Models in this team may re-roll one die per Defence Roll.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Staff Sergeant',
+    role: 'captain',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 108, max_per_army: 1, base_size_mm: 25, sort_order: 2,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'Inspiring Presence', description: 'Models that activate within 6" of this model may remove 1 stress at the start of their Activation.' },
+      { name: 'Tactical Advisor', description: 'Friendly Models within 4" may re-roll one Ranged Attack die per Action.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Sergeant',
+    role: 'captain',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 99, max_per_army: 1, base_size_mm: 25, sort_order: 3,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'Ooh Rah!', description: 'Action: Friendly Models within 6" may remove d5 Stress.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Auto Laser Rifleman',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 99, max_per_army: 2, base_size_mm: 25, sort_order: 4,
+    abilities: [
+      { name: 'Overload!', description: 'May re-roll any Ranged Attack die. If you choose to re-roll any dice, at the end of the Action this model receives 1 Stress.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Flamer Rifleman',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 98, max_per_army: 2, base_size_mm: 25, sort_order: 5,
+    abilities: [
+      { name: "Burn 'em Out!", description: 'This Model may ignore the Flamer Slow Keyword. If this Model performs two Ranged Attack Actions it gains +1 Stress.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Sniper',
+    role: 'specialist',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 3, defence: 5, health: 5,
+    points: 110, max_per_army: 2, base_size_mm: 25, sort_order: 6,
+    abilities: [
+      { name: 'Digital Optics', description: 'This Model may re-roll one Failed Ranged Attack die.' },
+      { name: 'Concealed Position', description: 'This Model receives an additional +1 to Defence Rolls when benefiting from Cover.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Breacher',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 98, max_per_army: 2, base_size_mm: 25, sort_order: 7,
+    abilities: [],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Combat Medic',
+    role: 'core',
+    actions: 3, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 100, max_per_army: 1, base_size_mm: 25, sort_order: 8,
+    abilities: [
+      { name: 'Medic!', description: 'Action: The bearer or a model in base contact may heal d5 wounds.' },
+      { name: 'Field Surgeon', description: 'Friendly Models within 4" of this Model gain an additional 8+ Save against all Damage.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Fire Team Leader',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 94, max_per_army: null, base_size_mm: 25, sort_order: 9,
+    abilities: [
+      { name: 'Command', description: 'This Model has the Order Keyword.' },
+      { name: 'Fire Coordinator', description: 'Friendly Models within 4" of this Model gain +1 to Ranged Attack rolls.' },
+      { name: 'Fire Team Leader (x)', description: 'May include 1 Fire Team Leader in Team for every 2 Rifleman.' },
+    ],
+  },
+  {
+    faction_slug: 'ooh-rah',
+    name: 'Rifleman',
+    role: 'core',
+    actions: 2, movement: 7, melee_attack: 5, ranged_attack: 5, defence: 5, health: 5,
+    points: 89, max_per_army: null, base_size_mm: 25, sort_order: 10,
+    abilities: [
+      { name: "It's What We Do", description: 'May re-roll one Ranged Attack Dice.' },
+    ],
+  },
+];

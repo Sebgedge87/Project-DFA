@@ -1,0 +1,102 @@
+export const einherjarUnitTypes = [
+  {
+    faction_slug: 'einherjar',
+    name: 'Konungr',
+    role: 'captain',
+    actions: 3, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 106, max_per_army: 1, base_size_mm: 25, sort_order: 1,
+    abilities: [
+      { name: 'Hearth-Call', description: 'This Model has the Order Keyword.' },
+      { name: 'Svalinn Shield', description: 'This model gains a 8+ shield save and adds +1 extra dice to their Defence rolls in Melee and Ranged combat.' },
+      { name: "Slayer's Instinct", description: 'This Model may re-roll any of its Melee Attack rolls.' },
+      { name: 'Shield Wall!', description: 'Models in this Team receive +1 to Defence Rolls when within 2" of another Friendly Model.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Jarl',
+    role: 'captain',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 101, max_per_army: 2, base_size_mm: 25, sort_order: 2,
+    abilities: [
+      { name: 'Hearth-Call', description: 'This Model has the Order Keyword.' },
+      { name: 'Svalinn Shield', description: 'This model gains a 8+ shield save and adds +1 dice to their defence rolls in melee and ranged combat.' },
+      { name: 'Raid!', description: 'Friendly Models that Activate within 4" of this Model may add 2" to their Movement.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Berserker',
+    role: 'specialist',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 104, max_per_army: 1, base_size_mm: 25, sort_order: 3,
+    abilities: [
+      { name: "Slayer's Instinct", description: 'This Model may re-roll any of its Melee Attack rolls.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Muspel-Warder',
+    role: 'specialist',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 107, max_per_army: 2, base_size_mm: 25, sort_order: 4,
+    abilities: [
+      { name: 'Fury of Muspelheim', description: 'When rolling for damage, roll 2 d5 and choose the highest result.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Thunder Caller',
+    role: 'specialist',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 101, max_per_army: 2, base_size_mm: 25, sort_order: 5,
+    abilities: [],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Sky-Shatterer',
+    role: 'specialist',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 99, max_per_army: 2, base_size_mm: 25, sort_order: 6,
+    abilities: [],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Skald',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 94, max_per_army: 2, base_size_mm: 25, sort_order: 7,
+    abilities: [
+      { name: 'Skald-Song', description: 'Friendly Models that Activate within 6" of this Model may remove 1 Stress at the start of their Activation.' },
+      { name: 'Echoes of Valhalla', description: 'When this Model Activates, Friendly models within 6" may remove 1 Stress.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Foringjar',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 99, max_per_army: null, base_size_mm: 25, sort_order: 8,
+    abilities: [
+      { name: 'Stalwart', description: 'This Model is not Knocked Back as the result of a Ranged Attack.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Hird',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 89, max_per_army: null, base_size_mm: 25, sort_order: 9,
+    abilities: [
+      { name: 'Steady-Hand', description: 'May re-roll one failed Ranged Attack Dice per Ranged Attack.' },
+    ],
+  },
+  {
+    faction_slug: 'einherjar',
+    name: 'Bondsman',
+    role: 'core',
+    actions: 2, movement: 6, melee_attack: 4, ranged_attack: 5, defence: 4, health: 5,
+    points: 86, max_per_army: null, base_size_mm: 25, sort_order: 10,
+    abilities: [],
+  },
+];
