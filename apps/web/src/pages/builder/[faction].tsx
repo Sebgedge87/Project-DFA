@@ -7,6 +7,7 @@ import { calculatePoints, validateArmy } from '@dfa/logic';
 import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationAlert } from '../../components/ui/ValidationAlert';
+import { ShareModal } from '../../components/ui/ShareModal';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -19,8 +20,10 @@ export default function BuilderPage() {
 
   const { data: units, isLoading } = useUnitTypes(faction?.id ?? null);
 
-  const { entries, listName, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction } =
+  const { entries, listName, listId, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction } =
     useArmyStore();
+  const [isPublic, setIsPublic] = useState(false);
+  const [shareToken, setShareToken] = useState<string | null>(null);
 
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -37,7 +40,14 @@ export default function BuilderPage() {
     if (!user) { navigate('/auth'); return; }
     setSaveError(null);
     try {
-      await saveList();
+      await saveList(isPublic);
+      // Fetch share_token after save so ShareModal can display it
+      const id = useArmyStore.getState().listId;
+      if (id && !shareToken) {
+        const { supabase } = await import('@dfa/supabase-client');
+        const { data } = await supabase.from('army_lists').select('share_token').eq('id', id).single();
+        if (data?.share_token) setShareToken(data.share_token);
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e: any) {
@@ -160,6 +170,17 @@ export default function BuilderPage() {
             <Save size={15} />
             {isSaving ? 'Saving…' : saved ? 'Saved!' : 'Save Army'}
           </button>
+          {listId && shareToken && (
+            <ShareModal
+              listId={listId}
+              shareToken={shareToken}
+              isPublic={isPublic}
+              onTogglePublic={async (pub) => {
+                await saveList(pub);
+                setIsPublic(pub);
+              }}
+            />
+          )}
         </div>
       </aside>
     </div>
