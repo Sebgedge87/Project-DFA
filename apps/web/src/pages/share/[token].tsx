@@ -22,7 +22,7 @@ async function downloadRoster(listId: string, listName: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${listName.replace(/[^a-z0-9]/gi, '_')}_roster.txt`;
+  a.download = `${listName.replace(/[^a-z0-9]/gi, '_')}_roster.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 }
