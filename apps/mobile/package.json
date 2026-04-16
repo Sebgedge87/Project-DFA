@@ -1,0 +1,41 @@
+{
+  "name": "@dfa/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "lint": "eslint . --ext ts,tsx",
+    "type-check": "tsc --noEmit",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@dfa/logic": "workspace:*",
+    "@dfa/supabase-client": "workspace:*",
+    "@dfa/types": "workspace:*",
+    "@react-navigation/bottom-tabs": "^6.0.0",
+    "@react-navigation/native": "^6.0.0",
+    "@react-navigation/stack": "^6.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
+    "expo": "~51.0.0",
+    "expo-auth-session": "latest",
+    "expo-haptics": "latest",
+    "expo-router": "~3.0.0",
+    "expo-secure-store": "latest",
+    "expo-sharing": "latest",
+    "nativewind": "^4.0.0",
+    "react": "18.2.0",
+    "react-native": "0.74.0",
+    "zustand": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "~18.2.0",
+    "@types/react-native": "~0.74.0",
+    "eslint": "latest",
+    "jest": "latest",
+    "typescript": "^5.0.0"
+  }
+}
