@@ -86,10 +86,9 @@ async function seed() {
 
   // ── 4. Weapons ───────────────────────────────────────────────────────────────
   console.log('Seeding weapons...');
-  const weaponsWithIds = weapons.map((w) => ({
+  const weaponsWithIds = weapons.map(({ faction_slug, ...w }) => ({
     ...w,
-    faction_id: w.faction_slug ? factionId[w.faction_slug] ?? null : null,
-    faction_slug: undefined,
+    faction_id: faction_slug ? factionId[faction_slug] ?? null : null,
   }));
   const { error: wpnErr } = await supabase
     .from('weapons')
@@ -101,14 +100,13 @@ async function seed() {
 
   // ── 5. Unit types ─────────────────────────────────────────────────────────
   console.log('Seeding unit types...');
-  const unitTypesWithIds = unitTypes.map((u) => ({
+  const unitTypesWithIds = unitTypes.map(({ faction_slug, ...u }) => ({
     ...u,
-    faction_id: factionId[u.faction_slug],
-    faction_slug: undefined,
+    faction_id: factionId[faction_slug],
   }));
   const { error: utErr } = await supabase
     .from('unit_types')
-    .upsert(unitTypesWithIds, { onConflict: 'id' });
+    .upsert(unitTypesWithIds, { onConflict: 'name,faction_id', ignoreDuplicates: true });
   if (utErr) throw utErr;
 
   const { data: utRows } = await supabase.from('unit_types').select('id, name, faction_id');
