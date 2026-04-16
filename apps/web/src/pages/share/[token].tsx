@@ -1,9 +1,31 @@
 import { useParams, Link } from 'react-router-dom';
-import { ExternalLink, BookOpen } from 'lucide-react';
-import { useShareList } from '@dfa/supabase-client';
+import { ExternalLink, BookOpen, Download } from 'lucide-react';
+import { useShareList, supabase } from '@dfa/supabase-client';
 import { StatBlock } from '../../components/unit/StatBlock';
 import { WeaponTable } from '../../components/unit/WeaponTable';
 import { AbilityList } from '../../components/unit/AbilityList';
+
+async function downloadRoster(listId: string, listName: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-pdf`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ listId }),
+    },
+  );
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${listName.replace(/[^a-z0-9]/gi, '_')}_roster.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function SharePage() {
   const { token } = useParams<{ token: string }>();
@@ -57,6 +79,13 @@ export default function SharePage() {
             >
               Build My Own
             </Link>
+            <button
+              onClick={() => downloadRoster(data.id, data.name)}
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+            >
+              <Download size={15} />
+              Export Roster
+            </button>
             {faction?.rulebook_url && (
               <a
                 href={faction.rulebook_url}
@@ -99,7 +128,7 @@ export default function SharePage() {
               </span>
             </div>
             <div className="p-4 space-y-4">
-              <StatBlock stats={entry.unit_type} />
+              <StatBlock {...entry.unit_type} />
               {entry.unit_type.abilities?.length > 0 && (
                 <AbilityList abilities={entry.unit_type.abilities} />
               )}
