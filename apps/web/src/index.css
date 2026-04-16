@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* DFA CSS custom properties — available outside Tailwind (e.g. inline styles) */
+:root {
+  --dfa-red:            #8B1A1A;
+  --dfa-red-bright:     #C41E1E;
+  --dfa-black:          #0D0D0D;
+  --dfa-surface:        #1A1A1A;
+  --dfa-surface-raised: #222222;
+  --dfa-border:         #3A1A1A;
+  --dfa-text:           #F0EDE8;
+  --dfa-text-muted:     #9A8A80;
+  --dfa-gold:           #C4943A;
+}
+
+body {
+  @apply bg-dfa-black text-dfa-text font-body;
+}

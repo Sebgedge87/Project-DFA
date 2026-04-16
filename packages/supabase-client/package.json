@@ -1,0 +1,20 @@
+{
+  "name": "@dfa/supabase-client",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext ts"
+  },
+  "dependencies": {
+    "@dfa/types": "workspace:*",
+    "@supabase/supabase-js": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
