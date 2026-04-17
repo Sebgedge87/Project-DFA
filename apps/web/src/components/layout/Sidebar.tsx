@@ -1,16 +1,30 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Swords, BookOpen, Users, User, LogOut } from 'lucide-react';
+import { Home, Swords, Library, Users, User, LogOut, BookOpen, Scroll } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
 const navItems = [
   { to: '/',          label: 'Home',      Icon: Home },
   { to: '/builder',   label: 'Builder',   Icon: Swords },
-  { to: '/lists',     label: 'My Lists',  Icon: BookOpen },
+  { to: '/lists',     label: 'My Lists',  Icon: Library },
   { to: '/community', label: 'Community', Icon: Users },
   { to: '/profile',   label: 'Profile',   Icon: User },
+  { to: '/rules',     label: 'Rules',     Icon: BookOpen },
 ];
 
-export function Sidebar({ className = '' }: { className?: string }) {
+const navLinkClass = (isActive: boolean) =>
+  `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full ${
+    isActive
+      ? 'bg-dfa-red text-white'
+      : 'text-dfa-text-muted hover:text-dfa-text hover:bg-dfa-surface-raised'
+  }`;
+
+interface SidebarProps {
+  className?: string;
+  onRosterOpen: () => void;
+  rosterTriggerRef: React.RefObject<HTMLButtonElement>;
+}
+
+export function Sidebar({ className = '', onRosterOpen, rosterTriggerRef }: SidebarProps) {
   const { user, signOut } = useAuthStore();
 
   return (
@@ -29,18 +43,22 @@ export function Sidebar({ className = '' }: { className?: string }) {
             key={to}
             to={to}
             end={to === '/'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                isActive
-                  ? 'bg-dfa-red text-white'
-                  : 'text-dfa-text-muted hover:text-dfa-text hover:bg-dfa-surface-raised'
-              }`
-            }
+            className={({ isActive }) => navLinkClass(isActive)}
           >
             <Icon size={17} />
             {label}
           </NavLink>
         ))}
+
+        {/* Roster — panel trigger, not a route */}
+        <button
+          ref={rosterTriggerRef}
+          onClick={onRosterOpen}
+          className={navLinkClass(false)}
+        >
+          <Scroll size={17} />
+          Roster
+        </button>
       </nav>
 
       {/* User / sign-out */}
