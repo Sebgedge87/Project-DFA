@@ -2,5 +2,6 @@
   "installCommand": "corepack enable pnpm && pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm turbo build --filter=@dfa/web...",
   "outputDirectory": "dist",
-  "framework": null
+  "framework": null,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
