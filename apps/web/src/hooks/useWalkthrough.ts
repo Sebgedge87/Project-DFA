@@ -12,5 +12,10 @@ export function useWalkthrough() {
     setDismissed(true);
   };
 
-  return { dismissed, dismiss };
+  const enable = () => {
+    localStorage.removeItem(KEY);
+    setDismissed(false);
+  };
+
+  return { dismissed, dismiss, enable };
 }

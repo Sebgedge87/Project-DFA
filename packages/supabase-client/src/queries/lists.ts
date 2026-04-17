@@ -187,7 +187,7 @@ export function useCloneList() {
       // Create new list for this user
       const { data: newList, error: listErr } = await supabase
         .from('army_lists')
-        .insert({ name: t.name, faction_id: t.faction_id, points_total: t.points_total, is_public: false } as any)
+        .insert({ name: t.name, faction_id: t.faction_id, points_total: t.points_total, is_public: false, user_id: userId } as any)
         .select()
         .single();
       if (listErr) throw listErr;
