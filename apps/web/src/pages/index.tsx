@@ -1,15 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useFactions } from '@dfa/supabase-client';
 import { FactionCard } from '../components/faction/FactionCard';
+import { WalkthroughBanner } from '../components/ui/WalkthroughBanner';
+import { useWalkthrough } from '../hooks/useWalkthrough';
 import { useArmyStore } from '../stores/armyStore';
 import type { Faction } from '@dfa/types';
 
 export default function HomePage() {
   const { data: factions, isLoading, error } = useFactions();
   const { faction: selectedFaction, setFaction } = useArmyStore();
+  const { dismissed, dismiss } = useWalkthrough();
   const navigate = useNavigate();
 
   const handleSelect = (faction: Faction) => {
+    dismiss();
     setFaction(faction);
     navigate(`/builder/${faction.slug}`);
   };
@@ -41,6 +45,15 @@ export default function HomePage() {
         </p>
       </div>
 
+      {!dismissed && (
+        <div className="mb-5">
+          <WalkthroughBanner
+            message="Welcome to the Army Builder! Pick a faction below to get started. Each faction plays differently — hover a card to read their tagline, then dive in."
+            onDismiss={dismiss}
+          />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {factions?.map((faction) => (
           <FactionCard
@@ -54,3 +67,4 @@ export default function HomePage() {
     </div>
   );
 }
+

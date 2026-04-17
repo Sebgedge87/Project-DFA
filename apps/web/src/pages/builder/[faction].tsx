@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft, Trash2, Plus, Minus } from 'lucide-react';
+import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
 import { calculatePoints, validateArmy } from '@dfa/logic';
 
@@ -8,8 +8,23 @@ import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationAlert } from '../../components/ui/ValidationAlert';
 import { ShareModal } from '../../components/ui/ShareModal';
+import { WalkthroughBanner } from '../../components/ui/WalkthroughBanner';
+import { useWalkthrough } from '../../hooks/useWalkthrough';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
+
+const ROLES = ['all', 'captain', 'specialist', 'core'] as const;
+type RoleFilter = (typeof ROLES)[number];
+
+function walkthroughHint(entries: ReturnType<typeof useArmyStore>['entries'], isDirty: boolean, listId: string | null): string | null {
+  const hasCaptain = entries.some(e => e.unit_type.role === 'captain');
+  const totalModels = entries.reduce((s, e) => s + e.quantity, 0);
+  if (!hasCaptain) return 'Start by adding a Captain — every army requires one. Use the role filter to find them quickly.';
+  if (totalModels < 5) return 'Captain added! Now fill your roster with Specialists and Core units. You need at least 5 models.';
+  if (isDirty && !listId) return 'Looking good! When you\'re happy with your list, hit Save Army to keep it.';
+  if (isDirty) return 'You have unsaved changes — hit Save Army to lock them in.';
+  return null;
+}
 
 export default function BuilderPage() {
   const { faction: factionSlug } = useParams<{ faction: string }>();
@@ -24,24 +39,37 @@ export default function BuilderPage() {
     useArmyStore();
   const [isPublic, setIsPublic] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(null);
-
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
+
+  const { dismissed, dismiss } = useWalkthrough();
 
   // Sync faction into store when resolved from URL
   if (faction && entries.length === 0 && !useArmyStore.getState().faction) {
     setFaction(faction);
   }
 
+  const filteredUnits = useMemo(() => {
+    if (!units) return [];
+    return units.filter(u => {
+      const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase());
+      const matchesRole = roleFilter === 'all' || u.role === roleFilter;
+      return matchesSearch && matchesRole;
+    });
+  }, [units, search, roleFilter]);
+
   const points = calculatePoints(entries);
   const validationErrors = validateArmy(entries).map((r) => r.error!).filter(Boolean);
+  const hint = !dismissed ? walkthroughHint(entries, isDirty, listId) : null;
 
   const handleSave = async () => {
     if (!user) { navigate('/auth'); return; }
     setSaveError(null);
     try {
       await saveList(isPublic);
-      // Fetch share_token after save so ShareModal can display it
       const id = useArmyStore.getState().listId;
       if (id && !shareToken) {
         const { supabase } = await import('@dfa/supabase-client');
@@ -49,6 +77,7 @@ export default function BuilderPage() {
         if (data?.share_token) setShareToken(data.share_token);
       }
       setSaved(true);
+      dismiss();
       setTimeout(() => setSaved(false), 2000);
     } catch (e: any) {
       setSaveError(e.message ?? 'Save failed');
@@ -68,10 +97,7 @@ export default function BuilderPage() {
       {/* Unit picker */}
       <div className="flex-1 p-4 md:p-6 overflow-y-auto">
         <div className="flex items-center gap-3 mb-4">
-          <button
-            onClick={() => navigate('/')}
-            className="text-dfa-text-muted hover:text-dfa-text transition-colors"
-          >
+          <button onClick={() => navigate('/')} className="text-dfa-text-muted hover:text-dfa-text transition-colors">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -82,21 +108,56 @@ export default function BuilderPage() {
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="text-dfa-text-muted text-sm animate-pulse py-8 text-center">
-            Loading units…
+        {hint && (
+          <div className="mb-4">
+            <WalkthroughBanner message={hint} onDismiss={dismiss} />
           </div>
+        )}
+
+        {/* Search + role filter */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dfa-text-muted pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search units…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-dfa-surface border border-dfa-border rounded pl-8 pr-8 py-1.5 text-sm text-dfa-text placeholder-dfa-text-muted focus:outline-none focus:border-dfa-red"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-dfa-text-muted hover:text-dfa-text">
+                <X size={13} />
+              </button>
+            )}
+          </div>
+          <div className="flex gap-1">
+            {ROLES.map(r => (
+              <button
+                key={r}
+                onClick={() => setRoleFilter(r)}
+                className={`px-3 py-1.5 rounded text-xs font-bold capitalize transition-colors ${
+                  roleFilter === r
+                    ? 'bg-dfa-red text-white'
+                    : 'bg-dfa-surface border border-dfa-border text-dfa-text-muted hover:text-dfa-text'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="text-dfa-text-muted text-sm animate-pulse py-8 text-center">Loading units…</div>
+        ) : filteredUnits.length === 0 ? (
+          <p className="text-dfa-text-muted text-sm text-center py-10">No units match your search.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {units?.map((unit) => {
+            {filteredUnits.map((unit) => {
               const entry = entries.find((e) => e.unit_type.id === unit.id);
               return (
-                <UnitCard
-                  key={unit.id}
-                  unit={unit}
-                  onAdd={addUnit}
-                  quantity={entry?.quantity ?? 0}
-                />
+                <UnitCard key={unit.id} unit={unit} onAdd={addUnit} quantity={entry?.quantity ?? 0} />
               );
             })}
           </div>
@@ -113,9 +174,7 @@ export default function BuilderPage() {
             className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
           />
           <PointsBar current={points} />
-          {validationErrors.length > 0 && (
-            <ValidationAlert errors={validationErrors} />
-          )}
+          {validationErrors.length > 0 && <ValidationAlert errors={validationErrors} />}
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -140,9 +199,7 @@ export default function BuilderPage() {
                     >
                       <Minus size={12} />
                     </button>
-                    <span className="w-5 text-center text-sm text-dfa-text font-mono">
-                      {entry.quantity}
-                    </span>
+                    <span className="w-5 text-center text-sm text-dfa-text font-mono">{entry.quantity}</span>
                     <button
                       onClick={() => addUnit(entry.unit_type)}
                       className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors"
