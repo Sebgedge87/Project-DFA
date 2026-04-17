@@ -44,9 +44,10 @@ export function useList(id: string | null) {
         .eq('id', id!)
         .single();
       if (error) throw error;
+      const d = data as any;
       return {
-        ...data,
-        army_entries: (data.army_entries ?? []).map((e: any) => ({
+        ...d,
+        army_entries: (d.army_entries ?? []).map((e: any) => ({
           id: e.id,
           quantity: e.quantity,
           unit_type: {
@@ -88,9 +89,10 @@ export function useShareList(token: string | null) {
         .eq('is_public', true)
         .single();
       if (error) throw error;
+      const d = data as any;
       return {
-        ...data,
-        army_entries: (data.army_entries ?? []).map((e: any) => ({
+        ...d,
+        army_entries: (d.army_entries ?? []).map((e: any) => ({
           id: e.id,
           quantity: e.quantity,
           unit_type: {
@@ -124,15 +126,16 @@ export function useSaveList() {
         (sum, e) => sum + e.unit_type.points * e.quantity,
         0,
       );
-      const { data: list, error: listErr } = await supabase
+      const { data: listRaw, error: listErr } = await supabase
         .from('army_lists')
         .upsert(
-          { id: listId ?? undefined, name: listName, faction_id: factionId, points_total: pointsTotal, is_public: isPublic },
+          { id: listId ?? undefined, name: listName, faction_id: factionId, points_total: pointsTotal, is_public: isPublic } as any,
           { onConflict: 'id' },
         )
         .select()
         .single();
       if (listErr) throw listErr;
+      const list = listRaw as any;
 
       await supabase.from('army_entries').delete().eq('army_list_id', list.id);
       const { error: entriesErr } = await supabase.from('army_entries').insert(
