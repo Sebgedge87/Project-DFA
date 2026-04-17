@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, ExternalLink, Pencil, Check, X, LogOut } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Pencil, Check, X } from 'lucide-react';
 import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLists, useCloneList } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
-import { useArmyStore } from '../stores/armyStore';
 
 function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string | null; size?: number }) {
   if (src) {
@@ -28,14 +27,13 @@ function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string |
 }
 
 export default function ProfilePage() {
-  const { user, signOut } = useAuthStore();
+  const { user } = useAuthStore();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id ?? null);
   const updateProfile = useUpdateProfile();
   const { data: lists, isLoading: listsLoading } = useMyLists(user?.id ?? null);
   const deleteList = useDeleteList();
   const { data: templateLists } = useTemplateLists();
   const cloneList = useCloneList();
-  const { loadList } = useArmyStore();
   const navigate = useNavigate();
 
   const [editing, setEditing] = useState(false);
@@ -68,10 +66,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLoad = async (id: string) => {
-    await loadList(id);
-    navigate(`/list/${id}`);
-  };
+  const handleLoad = (id: string) => navigate(`/list/${id}`);
 
   const handleDelete = (id: string) => {
     if (confirm('Delete this army list?')) deleteList.mutate(id);
@@ -297,17 +292,6 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-
-      {/* Sign out */}
-      <div className="pt-2 border-t border-dfa-border">
-        <button
-          onClick={async () => { await signOut(); navigate('/'); }}
-          className="flex items-center gap-2 text-dfa-text-muted hover:text-red-400 text-sm transition-colors"
-        >
-          <LogOut size={15} />
-          Sign out
-        </button>
-      </div>
 
     </div>
   );

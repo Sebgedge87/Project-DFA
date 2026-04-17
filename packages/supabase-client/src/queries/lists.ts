@@ -155,11 +155,37 @@ export function useCloneList() {
         );
         if (entriesErr) throw entriesErr;
       }
+
+      // Increment clone count on source list
+      await supabase
+        .from('army_lists')
+        .update({ clone_count: (t.clone_count ?? 0) + 1 } as any)
+        .eq('id', templateId);
+
       return list.id as string;
     },
     onSuccess: (_id, { userId }) => {
       qc.invalidateQueries({ queryKey: ['army_lists', userId] });
+      qc.invalidateQueries({ queryKey: ['community_lists'] });
     },
+  });
+}
+
+export function useCommunityLists(limit = 10) {
+  return useQuery<ArmyList[]>({
+    queryKey: ['community_lists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('army_lists')
+        .select('id, name, points_total, share_token, faction_id, clone_count, updated_at')
+        .eq('is_public', true)
+        .order('clone_count', { ascending: false })
+        .order('updated_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return data as ArmyList[];
+    },
+    staleTime: 1000 * 60 * 5,
   });
 }
 
