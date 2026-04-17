@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { RosterPanel } from '../ui/RosterPanel';
+import { WalkthroughModal } from '../ui/WalkthroughModal';
 
 export function AppShell() {
   const [rosterOpen, setRosterOpen] = useState(false);
@@ -27,6 +28,7 @@ export function AppShell() {
         onClose={() => setRosterOpen(false)}
         triggerRef={rosterTriggerRef}
       />
+      <WalkthroughModal />
     </div>
   );
 }
