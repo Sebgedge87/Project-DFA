@@ -35,7 +35,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="font-display text-dfa-red-bright text-4xl font-bold uppercase tracking-wide">
-            Death Fields
+            Death Fields Arena
           </h1>
           <p className="text-dfa-text-muted text-sm mt-1">Army Builder</p>
         </div>
@@ -81,14 +81,20 @@ export default function AuthPage() {
             </p>
           ) : (
             <form onSubmit={handleMagicLink} className="space-y-3">
-              <input
-                type="email"
-                required
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 bg-dfa-black border border-dfa-border rounded-md text-sm text-dfa-text placeholder:text-dfa-text-muted focus:outline-none focus:border-dfa-red"
-              />
+              <div>
+                <label htmlFor="magic-link-email" className="block text-xs text-dfa-text-muted mb-1">
+                  Email address
+                </label>
+                <input
+                  id="magic-link-email"
+                  type="email"
+                  required
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-dfa-black border border-dfa-border rounded-md text-sm text-dfa-text placeholder:text-dfa-text-muted focus:outline-none focus:border-dfa-red"
+                />
+              </div>
               {error && <p className="text-xs text-red-400">{error}</p>}
               <button
                 type="submit"

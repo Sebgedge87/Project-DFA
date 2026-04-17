@@ -26,7 +26,7 @@ export function useUpdateProfile() {
       updates,
     }: {
       userId: string;
-      updates: Partial<Pick<Profile, 'username' | 'display_name' | 'bio'>>;
+      updates: Partial<Pick<Profile, 'username' | 'display_name' | 'bio' | 'discord_id'>>;
     }) => {
       const { data, error } = await supabase
         .from('profiles')

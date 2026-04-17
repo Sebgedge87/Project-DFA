@@ -18,13 +18,12 @@ export function Sidebar({ className = '' }: { className?: string }) {
       {/* Logo */}
       <div className="px-5 py-5 border-b border-dfa-border">
         <span className="font-display text-dfa-red-bright font-bold text-xl tracking-wide uppercase">
-          Death Fields
+          Death Fields Arena
         </span>
-        <p className="text-dfa-text-muted text-xs mt-0.5">Army Builder</p>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 p-3 space-y-1">
+      <nav aria-label="Main navigation" className="flex-1 p-3 space-y-1">
         {navItems.map(({ to, label, Icon }) => (
           <NavLink
             key={to}
@@ -49,6 +48,7 @@ export function Sidebar({ className = '' }: { className?: string }) {
         {user ? (
           <button
             onClick={signOut}
+            aria-label="Sign out"
             className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm text-dfa-text-muted hover:text-dfa-text hover:bg-dfa-surface-raised transition-colors"
           >
             <LogOut size={17} />

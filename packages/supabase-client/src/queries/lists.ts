@@ -172,18 +172,18 @@ export function useCloneList() {
 }
 
 export function useCommunityLists(limit = 10) {
-  return useQuery<ArmyList[]>({
+  return useQuery({
     queryKey: ['community_lists'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('army_lists')
-        .select('id, name, points_total, share_token, faction_id, clone_count, updated_at')
+        .select('id, name, points_total, share_token, faction_id, clone_count, updated_at, faction:factions(color_primary, name)')
         .eq('is_public', true)
         .order('clone_count', { ascending: false })
         .order('updated_at', { ascending: false })
         .limit(limit);
       if (error) throw error;
-      return data as ArmyList[];
+      return data as (ArmyList & { faction: { color_primary: string; name: string } | null })[];
     },
     staleTime: 1000 * 60 * 5,
   });

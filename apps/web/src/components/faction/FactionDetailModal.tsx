@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, BookOpen, ShoppingBag, Sword } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useUnitTypes } from '@dfa/supabase-client';
 import type { Faction, UnitRole } from '@dfa/types';
 
@@ -44,7 +45,7 @@ export function FactionDetailModal({ faction, open, onOpenChange, onBuild }: Fac
                 {faction.name}
               </Dialog.Title>
             </div>
-            <Dialog.Close className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+            <Dialog.Close aria-label="Close" className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
               <X size={20} />
             </Dialog.Close>
           </div>
@@ -57,19 +58,16 @@ export function FactionDetailModal({ faction, open, onOpenChange, onBuild }: Fac
               <p className="text-dfa-text-muted text-sm leading-relaxed">{faction.lore}</p>
             )}
 
-            {/* External links */}
+            {/* Links */}
             <div className="flex flex-wrap gap-2">
-              {faction.rulebook_url && (
-                <a
-                  href={faction.rulebook_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors"
-                >
-                  <BookOpen size={13} />
-                  View Rulebook
-                </a>
-              )}
+              <Link
+                to="/rules"
+                onClick={() => onOpenChange(false)}
+                className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors"
+              >
+                <BookOpen size={13} />
+                View Rules
+              </Link>
               {faction.store_url && (
                 <a
                   href={faction.store_url}

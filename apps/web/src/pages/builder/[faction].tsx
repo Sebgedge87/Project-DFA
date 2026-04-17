@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb, Scroll } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
 import { calculatePoints, validateArmy } from '@dfa/logic';
 import type { UnitRole } from '@dfa/types';
@@ -10,6 +10,7 @@ import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationAlert } from '../../components/ui/ValidationAlert';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
+import { RosterPanel } from '../../components/ui/RosterPanel';
 import { useWalkthrough } from '../../hooks/useWalkthrough';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -39,6 +40,8 @@ export default function BuilderPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
   const [activeTab, setActiveTab] = useState<'units' | 'faction'>('units');
+  const [rosterOpen, setRosterOpen] = useState(false);
+  const rosterTriggerRef = useRef<HTMLButtonElement>(null);
 
   const { dismissed, dismiss, enable } = useWalkthrough();
 
@@ -158,8 +161,10 @@ export default function BuilderPage() {
               {/* Search + role filter */}
               <div className="flex flex-col sm:flex-row gap-2 mb-4">
                 <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dfa-text-muted pointer-events-none" />
+                  <label htmlFor="unit-search" className="sr-only">Search units</label>
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dfa-text-muted pointer-events-none" aria-hidden="true" />
                   <input
+                    id="unit-search"
                     type="text"
                     placeholder="Search units…"
                     value={search}
@@ -167,7 +172,7 @@ export default function BuilderPage() {
                     className="w-full bg-dfa-surface border border-dfa-border rounded pl-8 pr-8 py-1.5 text-sm text-dfa-text placeholder-dfa-text-muted focus:outline-none focus:border-dfa-red"
                   />
                   {search && (
-                    <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-dfa-text-muted hover:text-dfa-text">
+                    <button onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 text-dfa-text-muted hover:text-dfa-text">
                       <X size={13} />
                     </button>
                   )}
@@ -177,6 +182,7 @@ export default function BuilderPage() {
                     <button
                       key={r}
                       onClick={() => setRoleFilter(r)}
+                      aria-pressed={roleFilter === r}
                       className={`px-3 py-1.5 rounded text-xs font-bold capitalize transition-colors ${
                         roleFilter === r
                           ? 'bg-dfa-red text-white'
@@ -221,12 +227,19 @@ export default function BuilderPage() {
 
               {/* Links */}
               <div className="flex flex-wrap gap-2">
-                {faction.rulebook_url && (
-                  <a href={faction.rulebook_url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors">
-                    <BookOpen size={13} /> View Rulebook
-                  </a>
-                )}
+                <Link
+                  to="/rules"
+                  className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors"
+                >
+                  <BookOpen size={13} /> View Rules
+                </Link>
+                <button
+                  ref={rosterTriggerRef}
+                  onClick={() => setRosterOpen(true)}
+                  className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors"
+                >
+                  <Scroll size={13} /> Roster Reference
+                </button>
                 {faction.store_url && (
                   <a href={faction.store_url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors">
@@ -314,16 +327,19 @@ export default function BuilderPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => setQuantity(entry.id, entry.quantity - 1)}
+                    aria-label={`Remove one ${entry.unit_type.name}`}
                     className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors">
                     <Minus size={12} />
                   </button>
-                  <span className="w-5 text-center text-sm text-dfa-text font-mono">{entry.quantity}</span>
+                  <span className="w-5 text-center text-sm text-dfa-text font-mono" aria-label={`${entry.quantity} ${entry.unit_type.name}`}>{entry.quantity}</span>
                   <button onClick={() => addUnit(entry.unit_type)}
+                    aria-label={`Add one ${entry.unit_type.name}`}
                     className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors">
                     <Plus size={12} />
                   </button>
                 </div>
                 <button onClick={() => removeUnit(entry.id)}
+                  aria-label={`Remove ${entry.unit_type.name} from army`}
                   className="text-dfa-text-muted hover:text-red-400 transition-colors ml-1">
                   <Trash2 size={15} />
                 </button>
@@ -353,6 +369,8 @@ export default function BuilderPage() {
           )}
         </div>
       </aside>
+
+      <RosterPanel open={rosterOpen} onClose={() => setRosterOpen(false)} triggerRef={rosterTriggerRef} />
     </div>
   );
 }

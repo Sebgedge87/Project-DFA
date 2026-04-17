@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, ExternalLink, Pencil, Check, X } from 'lucide-react';
-import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLists, useCloneList } from '@dfa/supabase-client';
+import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLists, useCloneList, supabase } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
 
 function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string | null; size?: number }) {
@@ -20,6 +20,7 @@ function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string |
     <div
       className="rounded-full bg-dfa-red flex items-center justify-center text-white font-display font-bold"
       style={{ width: size * 4, height: size * 4, fontSize: size * 1.4 }}
+      aria-hidden="true"
     >
       {initials}
     </div>
@@ -40,12 +41,20 @@ export default function ProfilePage() {
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
+  const [discordId, setDiscordId] = useState('');
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const hasEmailProvider = user?.identities?.some(i => i.provider === 'email');
 
   const startEdit = () => {
     setDisplayName(profile?.display_name ?? '');
     setUsername(profile?.username ?? '');
     setBio(profile?.bio ?? '');
+    setDiscordId(profile?.discord_id ?? '');
     setSaveError(null);
     setEditing(true);
   };
@@ -58,11 +67,34 @@ export default function ProfilePage() {
     try {
       await updateProfile.mutateAsync({
         userId: user.id,
-        updates: { display_name: displayName || null, username: username || undefined, bio: bio || null },
+        updates: {
+          display_name: displayName || null,
+          username: username || undefined,
+          bio: bio || null,
+          discord_id: discordId || null,
+        },
       });
       setEditing(false);
     } catch (e: any) {
       setSaveError(e.message ?? 'Failed to save');
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) return;
+    setResetLoading(true);
+    setResetError(null);
+    setResetSent(false);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: window.location.origin + '/reset-password',
+      });
+      if (error) throw error;
+      setResetSent(true);
+    } catch (e: any) {
+      setResetError(e.message ?? 'Failed to send reset email');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -89,8 +121,9 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-dfa-text-muted mb-1">Display name</label>
+                    <label htmlFor="profile-display-name" className="block text-xs text-dfa-text-muted mb-1">Display name</label>
                     <input
+                      id="profile-display-name"
                       value={displayName}
                       onChange={e => setDisplayName(e.target.value)}
                       placeholder="Your name"
@@ -98,8 +131,9 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-dfa-text-muted mb-1">Username</label>
+                    <label htmlFor="profile-username" className="block text-xs text-dfa-text-muted mb-1">Username</label>
                     <input
+                      id="profile-username"
                       value={username}
                       onChange={e => setUsername(e.target.value)}
                       placeholder="username"
@@ -108,8 +142,9 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-dfa-text-muted mb-1">Bio</label>
+                  <label htmlFor="profile-bio" className="block text-xs text-dfa-text-muted mb-1">Bio</label>
                   <textarea
+                    id="profile-bio"
                     value={bio}
                     onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself…"
@@ -117,6 +152,25 @@ export default function ProfilePage() {
                     className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red resize-none"
                   />
                 </div>
+                <div>
+                  <label htmlFor="profile-discord" className="block text-xs text-dfa-text-muted mb-1">Discord ID</label>
+                  <input
+                    id="profile-discord"
+                    value={discordId}
+                    onChange={e => setDiscordId(e.target.value)}
+                    placeholder="e.g. username or username#1234"
+                    maxLength={100}
+                    className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
+                  />
+                </div>
+
+                {/* Email — read-only */}
+                <div>
+                  <label className="block text-xs text-dfa-text-muted mb-1">Email address</label>
+                  <p className="text-sm text-dfa-text-muted">{user?.email}</p>
+                  <p className="text-xs text-dfa-text-muted mt-0.5">To change your email, contact support.</p>
+                </div>
+
                 {saveError && <p className="text-xs text-red-400">{saveError}</p>}
                 <div className="flex gap-2">
                   <button
@@ -139,14 +193,17 @@ export default function ProfilePage() {
             ) : (
               <>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="font-display text-dfa-text font-bold text-xl leading-none">
+                  <h1 className="font-display text-dfa-text font-bold text-xl leading-none">
                     {profileLoading ? '…' : displayedName}
-                  </h2>
+                  </h1>
                   {profile?.username && (
                     <span className="text-dfa-text-muted text-sm">@{profile.username}</span>
                   )}
                 </div>
                 <p className="text-dfa-text-muted text-xs mt-1">{user?.email}</p>
+                {profile?.discord_id && (
+                  <p className="text-dfa-text-muted text-xs mt-0.5">Discord: {profile.discord_id}</p>
+                )}
                 {profile?.bio && (
                   <p className="text-dfa-text text-sm mt-2 leading-relaxed">{profile.bio}</p>
                 )}
@@ -160,21 +217,39 @@ export default function ProfilePage() {
           {!editing && (
             <button
               onClick={startEdit}
-              title="Edit profile"
+              aria-label="Edit profile"
               className="text-dfa-text-muted hover:text-dfa-text transition-colors shrink-0"
             >
               <Pencil size={15} />
             </button>
           )}
         </div>
+
+        {/* Password reset — only for email/password accounts */}
+        {!editing && hasEmailProvider && (
+          <div className="mt-4 pt-4 border-t border-dfa-border">
+            {resetSent ? (
+              <p className="text-xs text-dfa-gold">Reset email sent — check your inbox.</p>
+            ) : (
+              <button
+                onClick={handlePasswordReset}
+                disabled={resetLoading}
+                className="text-xs text-dfa-text-muted hover:text-dfa-text transition-colors disabled:opacity-50"
+              >
+                {resetLoading ? 'Sending…' : 'Send password reset email'}
+              </button>
+            )}
+            {resetError && <p className="text-xs text-red-400 mt-1">{resetError}</p>}
+          </div>
+        )}
       </div>
 
       {/* Army lists */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-dfa-text text-lg font-bold uppercase tracking-wide">
+          <h2 className="font-display text-dfa-text text-lg font-bold uppercase tracking-wide">
             My Armies
-          </h3>
+          </h2>
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-2 px-3 py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded transition-colors"
@@ -221,8 +296,8 @@ export default function ProfilePage() {
                       href={`/share/${list.share_token}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label="View share link"
                       className="text-dfa-text-muted hover:text-dfa-text transition-colors"
-                      title="View share link"
                     >
                       <ExternalLink size={16} />
                     </a>
@@ -235,6 +310,7 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={() => handleDelete(list.id)}
+                    aria-label="Delete army"
                     className="text-dfa-text-muted hover:text-red-400 transition-colors"
                   >
                     <Trash2 size={16} />
@@ -249,9 +325,9 @@ export default function ProfilePage() {
       {/* Starter armies */}
       {templateLists && templateLists.length > 0 && (
         <div>
-          <h3 className="font-display text-dfa-text text-lg font-bold uppercase tracking-wide mb-4">
+          <h2 className="font-display text-dfa-text text-lg font-bold uppercase tracking-wide mb-4">
             Starter Armies
-          </h3>
+          </h2>
           <div className="space-y-3">
             {templateLists.map((tmpl) => (
               <div

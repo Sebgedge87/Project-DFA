@@ -45,7 +45,7 @@ export function ShareModal({ listId, shareToken, isPublic, onTogglePublic }: Sha
             <Dialog.Title className="font-display text-dfa-text text-xl font-bold">
               Share Army
             </Dialog.Title>
-            <Dialog.Close className="text-dfa-text-muted hover:text-dfa-text transition-colors">
+            <Dialog.Close aria-label="Close" className="text-dfa-text-muted hover:text-dfa-text transition-colors">
               <X size={18} />
             </Dialog.Close>
           </div>
@@ -70,6 +70,8 @@ export function ShareModal({ listId, shareToken, isPublic, onTogglePublic }: Sha
             <button
               onClick={handleToggle}
               disabled={toggling}
+              aria-label={isPublic ? 'Make private' : 'Make public'}
+              aria-pressed={isPublic}
               className={`relative w-11 h-6 rounded-full transition-colors ${
                 isPublic ? 'bg-dfa-red' : 'bg-dfa-surface-raised'
               }`}
@@ -90,7 +92,9 @@ export function ShareModal({ listId, shareToken, isPublic, onTogglePublic }: Sha
               </p>
               <div className="flex gap-2">
                 <input
+                  id="share-url"
                   readOnly
+                  aria-label="Share URL"
                   value={shareUrl}
                   className="flex-1 bg-dfa-black border border-dfa-border rounded px-3 py-2 text-xs text-dfa-text-muted font-mono focus:outline-none select-all"
                   onClick={(e) => (e.target as HTMLInputElement).select()}
