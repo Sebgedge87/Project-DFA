@@ -198,6 +198,26 @@ export function useDeleteList() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['army_lists'] });
+      qc.invalidateQueries({ queryKey: ['public_lists'] });
+      qc.invalidateQueries({ queryKey: ['community_lists'] });
+    },
+  });
+}
+
+export function useToggleListPublic() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, isPublic }: { id: string; isPublic: boolean }) => {
+      const { error } = await supabase
+        .from('army_lists')
+        .update({ is_public: isPublic } as any)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['army_lists'] });
+      qc.invalidateQueries({ queryKey: ['public_lists'] });
+      qc.invalidateQueries({ queryKey: ['community_lists'] });
     },
   });
 }

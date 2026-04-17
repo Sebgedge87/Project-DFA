@@ -1,35 +1,53 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ExternalLink, BookOpen, Download } from 'lucide-react';
-import { useShareList, supabase } from '@dfa/supabase-client';
+import { BookOpen, FileText, Loader2 } from 'lucide-react';
+import { useShareList } from '@dfa/supabase-client';
 import { StatBlock } from '../../components/unit/StatBlock';
 import { WeaponTable } from '../../components/unit/WeaponTable';
 import { AbilityList } from '../../components/unit/AbilityList';
+import type { ArmyEntry } from '@dfa/types';
 
-async function downloadRoster(listId: string, listName: string) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-pdf`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({ listId }),
-    },
-  );
-  const blob = await res.blob();
+function exportRosterText(data: { name: string; points_total: number; faction?: any; army_entries: ArmyEntry[] }) {
+  const lines: string[] = [
+    `${data.name}  —  ${data.faction?.name ?? 'Unknown Faction'}`,
+    `${data.points_total}pts`,
+    '='.repeat(40),
+    '',
+  ];
+
+  for (const entry of data.army_entries) {
+    const u = entry.unit_type;
+    lines.push(`${u.name}${entry.quantity > 1 ? ` ×${entry.quantity}` : ''}  (${u.points * entry.quantity}pts)`);
+    lines.push(`  [${u.role.toUpperCase()}]  ACT:${u.actions}  MOV:${u.movement}"  HP:${u.health}  MEL:${u.melee_attack}  RAN:${u.ranged_attack}  DEF:${u.defence}`);
+    for (const a of (u.abilities ?? [])) {
+      lines.push(`  • ${a.name}: ${a.description}`);
+    }
+    const weapons = u.weapons ?? [];
+    if (weapons.length) {
+      lines.push('  Weapons:');
+      for (const w of weapons) {
+        lines.push(`    ${w.name}: Rng ${w.range_inches ?? '—'} · Att ${w.num_attacks} · Dmg ${w.damage}`);
+      }
+    }
+    lines.push('');
+  }
+  lines.push('Death Fields Arena · wargamesatlantic.com');
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${listName.replace(/[^a-z0-9]/gi, '_')}_roster.pdf`;
+  a.download = `${data.name.replace(/[^a-z0-9]/gi, '_')}_roster.txt`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
 export default function SharePage() {
   const { token } = useParams<{ token: string }>();
   const { data, isLoading, error } = useShareList(token ?? null);
+  const [exporting, setExporting] = useState(false);
 
   if (isLoading) {
     return (
@@ -54,7 +72,16 @@ export default function SharePage() {
   }
 
   const faction = (data as any).faction;
-  const entries = data.army_entries ?? [];
+  const entries: ArmyEntry[] = data.army_entries ?? [];
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      exportRosterText({ name: data.name, points_total: data.points_total, faction, army_entries: entries });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-dfa-black">
@@ -79,13 +106,17 @@ export default function SharePage() {
             >
               Build My Own
             </Link>
+
+            {/* Client-side text export — always works */}
             <button
-              onClick={() => downloadRoster(data.id, data.name)}
-              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+              onClick={handleExport}
+              disabled={exporting}
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors disabled:opacity-50"
             >
-              <Download size={15} />
+              {exporting ? <Loader2 size={15} className="animate-spin" /> : <FileText size={15} />}
               Export Roster
             </button>
+
             <Link
               to="/rules"
               className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
@@ -100,7 +131,6 @@ export default function SharePage() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
               >
-                <ExternalLink size={15} />
                 Buy Miniatures
               </a>
             )}
@@ -110,7 +140,7 @@ export default function SharePage() {
 
       {/* Unit list */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-8 space-y-6">
-        {entries.map((entry: any) => (
+        {entries.map((entry: ArmyEntry) => (
           <div key={entry.id} className="bg-dfa-surface border border-dfa-border rounded-lg overflow-hidden">
             <div className="px-4 py-3 border-b border-dfa-border flex items-center justify-between">
               <div>
@@ -125,10 +155,10 @@ export default function SharePage() {
             </div>
             <div className="p-4 space-y-4">
               <StatBlock {...entry.unit_type} />
-              {entry.unit_type.abilities?.length > 0 && (
+              {(entry.unit_type.abilities?.length ?? 0) > 0 && (
                 <AbilityList abilities={entry.unit_type.abilities} />
               )}
-              {entry.unit_type.weapons?.length > 0 && (
+              {(entry.unit_type.weapons?.length ?? 0) > 0 && (
                 <WeaponTable weapons={entry.unit_type.weapons} />
               )}
             </div>
