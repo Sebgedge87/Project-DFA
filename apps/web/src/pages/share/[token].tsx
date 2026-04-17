@@ -1,53 +1,15 @@
-import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, FileText, Loader2 } from 'lucide-react';
+import { BookOpen, FileText } from 'lucide-react';
 import { useShareList } from '@dfa/supabase-client';
 import { StatBlock } from '../../components/unit/StatBlock';
 import { WeaponTable } from '../../components/unit/WeaponTable';
 import { AbilityList } from '../../components/unit/AbilityList';
+import { exportRosterPdf } from '../../utils/exportRosterPdf';
 import type { ArmyEntry } from '@dfa/types';
-
-function exportRosterText(data: { name: string; points_total: number; faction?: any; army_entries: ArmyEntry[] }) {
-  const lines: string[] = [
-    `${data.name}  —  ${data.faction?.name ?? 'Unknown Faction'}`,
-    `${data.points_total}pts`,
-    '='.repeat(40),
-    '',
-  ];
-
-  for (const entry of data.army_entries) {
-    const u = entry.unit_type;
-    lines.push(`${u.name}${entry.quantity > 1 ? ` ×${entry.quantity}` : ''}  (${u.points * entry.quantity}pts)`);
-    lines.push(`  [${u.role.toUpperCase()}]  ACT:${u.actions}  MOV:${u.movement}"  HP:${u.health}  MEL:${u.melee_attack}  RAN:${u.ranged_attack}  DEF:${u.defence}`);
-    for (const a of (u.abilities ?? [])) {
-      lines.push(`  • ${a.name}: ${a.description}`);
-    }
-    const weapons = u.weapons ?? [];
-    if (weapons.length) {
-      lines.push('  Weapons:');
-      for (const w of weapons) {
-        lines.push(`    ${w.name}: Rng ${w.range_inches ?? '—'} · Att ${w.num_attacks} · Dmg ${w.damage}`);
-      }
-    }
-    lines.push('');
-  }
-  lines.push('Death Fields Arena · wargamesatlantic.com');
-
-  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${data.name.replace(/[^a-z0-9]/gi, '_')}_roster.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
 
 export default function SharePage() {
   const { token } = useParams<{ token: string }>();
   const { data, isLoading, error } = useShareList(token ?? null);
-  const [exporting, setExporting] = useState(false);
 
   if (isLoading) {
     return (
@@ -74,13 +36,8 @@ export default function SharePage() {
   const faction = (data as any).faction;
   const entries: ArmyEntry[] = data.army_entries ?? [];
 
-  const handleExport = async () => {
-    setExporting(true);
-    try {
-      exportRosterText({ name: data.name, points_total: data.points_total, faction, army_entries: entries });
-    } finally {
-      setExporting(false);
-    }
+  const handleExport = () => {
+    exportRosterPdf({ name: data.name, points_total: data.points_total, faction, army_entries: entries });
   };
 
   return (
@@ -107,13 +64,11 @@ export default function SharePage() {
               Build My Own
             </Link>
 
-            {/* Client-side text export — always works */}
             <button
               onClick={handleExport}
-              disabled={exporting}
-              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
             >
-              {exporting ? <Loader2 size={15} className="animate-spin" /> : <FileText size={15} />}
+              <FileText size={15} />
               Export Roster
             </button>
 

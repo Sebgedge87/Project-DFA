@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 
 const EXTERNAL_RULES_URL = 'https://www.wargamesatlantic.com/products/death-fields-arena-rules';
+const PDF_URL = import.meta.env.VITE_RULES_PDF_URL as string | undefined || '/rules.pdf';
 
 export default function RulesPage() {
   const [pdfMissing, setPdfMissing] = useState(false);
 
   useEffect(() => {
-    fetch('/rules.pdf', { method: 'HEAD' })
+    fetch(PDF_URL, { method: 'HEAD' })
       .then(r => { if (!r.ok) setPdfMissing(true); })
       .catch(() => setPdfMissing(true));
   }, []);
@@ -50,7 +51,7 @@ export default function RulesPage() {
         </div>
       ) : (
         <iframe
-          src="/rules.pdf#toolbar=0&navpanes=0&scrollbar=0"
+          src={`${PDF_URL}#toolbar=0&navpanes=0&scrollbar=0`}
           title="Death Fields Arena rules"
           sandbox="allow-scripts allow-same-origin"
           onContextMenu={e => e.preventDefault()}

@@ -1,7 +1,19 @@
 import type { Weapon } from '@dfa/types';
+import { Tooltip } from '../ui/Tooltip';
+import { WEAPON_COLUMN_DEFINITIONS, KEYWORD_DEFINITIONS } from '../../data/statDefinitions';
 
 interface WeaponTableProps {
   weapons?: Weapon[];
+}
+
+function ColHeader({ label }: { label: string }) {
+  const def = WEAPON_COLUMN_DEFINITIONS[label];
+  if (!def) return <>{label}</>;
+  return (
+    <Tooltip title={def.title} description={def.description}>
+      <span>{label}</span>
+    </Tooltip>
+  );
 }
 
 export function WeaponTable({ weapons }: WeaponTableProps) {
@@ -17,11 +29,11 @@ export function WeaponTable({ weapons }: WeaponTableProps) {
           <thead>
             <tr className="text-dfa-text-muted text-[10px] uppercase tracking-wide">
               <th className="text-left pb-1 pr-2 font-medium">Name</th>
-              <th className="text-center pb-1 px-1 font-medium">Range</th>
-              <th className="text-center pb-1 px-1 font-medium">Att</th>
-              <th className="text-center pb-1 px-1 font-medium">Dmg</th>
-              <th className="text-center pb-1 px-1 font-medium">AP</th>
-              <th className="text-left pb-1 pl-2 font-medium">Keywords</th>
+              <th className="text-center pb-1 px-1 font-medium"><ColHeader label="Range" /></th>
+              <th className="text-center pb-1 px-1 font-medium"><ColHeader label="Att" /></th>
+              <th className="text-center pb-1 px-1 font-medium"><ColHeader label="Dmg" /></th>
+              <th className="text-center pb-1 px-1 font-medium"><ColHeader label="AP" /></th>
+              <th className="text-left pb-1 pl-2 font-medium"><ColHeader label="Keywords" /></th>
             </tr>
           </thead>
           <tbody>
@@ -39,13 +51,22 @@ export function WeaponTable({ weapons }: WeaponTableProps) {
                 <td className="py-1 pl-2 text-dfa-text-muted">
                   {weapon.weapon_keywords.length === 0
                     ? '—'
-                    : weapon.weapon_keywords.map((wk, i) => (
-                        <span key={i}>
-                          {i > 0 && ', '}
-                          {wk.keyword.name}
-                          {wk.parameter ? `(${wk.parameter})` : ''}
-                        </span>
-                      ))}
+                    : weapon.weapon_keywords.map((wk, i) => {
+                        const kwDef = KEYWORD_DEFINITIONS[wk.keyword.name];
+                        const label = wk.keyword.name + (wk.parameter ? `(${wk.parameter})` : '');
+                        return (
+                          <span key={i}>
+                            {i > 0 && ', '}
+                            {kwDef ? (
+                              <Tooltip title={kwDef.title} description={kwDef.description}>
+                                <span>{label}</span>
+                              </Tooltip>
+                            ) : (
+                              label
+                            )}
+                          </span>
+                        );
+                      })}
                 </td>
               </tr>
             ))}

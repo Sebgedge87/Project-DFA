@@ -86,7 +86,6 @@ export function useShareList(token: string | null) {
           )
         `)
         .eq('share_token', token!)
-        .eq('is_public', true)
         .single();
       if (error) throw error;
       const d = data as any;
