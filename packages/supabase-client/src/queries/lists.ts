@@ -155,6 +155,63 @@ export function useSaveList() {
   });
 }
 
+export function useTemplateLists() {
+  return useQuery<ArmyList[]>({
+    queryKey: ['template_lists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('army_lists')
+        .select('*')
+        .eq('is_template', true)
+        .order('name');
+      if (error) throw error;
+      return data as ArmyList[];
+    },
+    staleTime: 1000 * 60 * 60,
+  });
+}
+
+export function useCloneList() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ templateId, userId }: { templateId: string; userId: string }) => {
+      // Fetch template + entries
+      const { data: tmpl, error: tmplErr } = await supabase
+        .from('army_lists')
+        .select('*, army_entries(unit_type_id, quantity)')
+        .eq('id', templateId)
+        .single();
+      if (tmplErr) throw tmplErr;
+      const t = tmpl as any;
+
+      // Create new list for this user
+      const { data: newList, error: listErr } = await supabase
+        .from('army_lists')
+        .insert({ name: t.name, faction_id: t.faction_id, points_total: t.points_total, is_public: false } as any)
+        .select()
+        .single();
+      if (listErr) throw listErr;
+      const list = newList as any;
+
+      // Copy entries
+      if (t.army_entries?.length) {
+        const { error: entriesErr } = await supabase.from('army_entries').insert(
+          t.army_entries.map((e: any) => ({
+            army_list_id: list.id,
+            unit_type_id: e.unit_type_id,
+            quantity: e.quantity,
+          })),
+        );
+        if (entriesErr) throw entriesErr;
+      }
+      return list.id as string;
+    },
+    onSuccess: (_id, { userId }) => {
+      qc.invalidateQueries({ queryKey: ['army_lists', userId] });
+    },
+  });
+}
+
 export function useDeleteList() {
   const qc = useQueryClient();
   return useMutation({
