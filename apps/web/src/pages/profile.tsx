@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, ExternalLink, Pencil, Check, X, LogOut } from 'lucide-react';
-import { useMyLists, useDeleteList, useProfile, useUpdateProfile } from '@dfa/supabase-client';
+import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLists, useCloneList } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
 import { useArmyStore } from '../stores/armyStore';
 
@@ -33,6 +33,8 @@ export default function ProfilePage() {
   const updateProfile = useUpdateProfile();
   const { data: lists, isLoading: listsLoading } = useMyLists(user?.id ?? null);
   const deleteList = useDeleteList();
+  const { data: templateLists } = useTemplateLists();
+  const cloneList = useCloneList();
   const { loadList } = useArmyStore();
   const navigate = useNavigate();
 
@@ -248,6 +250,53 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Starter armies */}
+      {templateLists && templateLists.length > 0 && (
+        <div>
+          <h3 className="font-display text-dfa-text text-lg font-bold uppercase tracking-wide mb-4">
+            Starter Armies
+          </h3>
+          <div className="space-y-3">
+            {templateLists.map((tmpl) => (
+              <div
+                key={tmpl.id}
+                className="bg-dfa-surface border border-dfa-border rounded-lg p-4 flex items-center gap-4"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-dfa-text font-medium truncate">{tmpl.name}</p>
+                  <p className="text-xs text-dfa-text-muted mt-0.5">
+                    <span className="text-dfa-gold font-mono font-bold">{tmpl.points_total}pts</span>
+                    {' · '}Sample list
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <a
+                    href={`/share/${tmpl.share_token}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                  >
+                    View
+                  </a>
+                  {user && (
+                    <button
+                      onClick={async () => {
+                        const id = await cloneList.mutateAsync({ templateId: tmpl.id, userId: user.id });
+                        navigate(`/list/${id}`);
+                      }}
+                      disabled={cloneList.isPending}
+                      className="px-3 py-1.5 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors disabled:opacity-50"
+                    >
+                      Use as Template
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Sign out */}
       <div className="pt-2 border-t border-dfa-border">
