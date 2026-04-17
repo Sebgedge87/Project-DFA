@@ -118,69 +118,71 @@ export default function BuilderPage() {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto divide-y divide-dfa-border">
-          {entries.length === 0 ? (
-            <p className="text-dfa-text-muted text-sm text-center py-10 px-4">
-              Add units from the list to build your army.
-            </p>
-          ) : (
-            entries.map((entry) => (
-              <div key={entry.id} className="flex items-center gap-3 p-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-dfa-text font-medium truncate">{entry.unit_type.name}</p>
-                  <p className="text-xs text-dfa-gold font-mono">
-                    {entry.unit_type.points * entry.quantity}pts
-                  </p>
-                </div>
-                <div className="flex items-center gap-1">
+        <div className="flex-1 overflow-y-auto">
+          <div className="divide-y divide-dfa-border">
+            {entries.length === 0 ? (
+              <p className="text-dfa-text-muted text-sm text-center py-10 px-4">
+                Add units from the list to build your army.
+              </p>
+            ) : (
+              entries.map((entry) => (
+                <div key={entry.id} className="flex items-center gap-3 p-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-dfa-text font-medium truncate">{entry.unit_type.name}</p>
+                    <p className="text-xs text-dfa-gold font-mono">
+                      {entry.unit_type.points * entry.quantity}pts
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setQuantity(entry.id, entry.quantity - 1)}
+                      className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors"
+                    >
+                      <Minus size={12} />
+                    </button>
+                    <span className="w-5 text-center text-sm text-dfa-text font-mono">
+                      {entry.quantity}
+                    </span>
+                    <button
+                      onClick={() => addUnit(entry.unit_type)}
+                      className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors"
+                    >
+                      <Plus size={12} />
+                    </button>
+                  </div>
                   <button
-                    onClick={() => setQuantity(entry.id, entry.quantity - 1)}
-                    className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors"
+                    onClick={() => removeUnit(entry.id)}
+                    className="text-dfa-text-muted hover:text-red-400 transition-colors ml-1"
                   >
-                    <Minus size={12} />
-                  </button>
-                  <span className="w-5 text-center text-sm text-dfa-text font-mono">
-                    {entry.quantity}
-                  </span>
-                  <button
-                    onClick={() => addUnit(entry.unit_type)}
-                    className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors"
-                  >
-                    <Plus size={12} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
-                <button
-                  onClick={() => removeUnit(entry.id)}
-                  className="text-dfa-text-muted hover:text-red-400 transition-colors ml-1"
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+              ))
+            )}
+          </div>
 
-        <div className="p-4 border-t border-dfa-border space-y-2">
-          {saveError && <p className="text-xs text-red-400">{saveError}</p>}
-          <button
-            onClick={handleSave}
-            disabled={isSaving || !isDirty}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-dfa-red hover:bg-dfa-red-bright disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded transition-colors"
-          >
-            <Save size={15} />
-            {isSaving ? 'Saving…' : saved ? 'Saved!' : 'Save Army'}
-          </button>
-          {listId && shareToken && (
-            <ShareModal
-              listId={listId}
-              shareToken={shareToken}
-              isPublic={isPublic}
-              onTogglePublic={async (pub) => {
-                await saveList(pub);
-                setIsPublic(pub);
-              }}
-            />
-          )}
+          <div className="p-4 space-y-2">
+            {saveError && <p className="text-xs text-red-400">{saveError}</p>}
+            <button
+              onClick={handleSave}
+              disabled={isSaving || !isDirty}
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-dfa-red hover:bg-dfa-red-bright disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded transition-colors"
+            >
+              <Save size={15} />
+              {isSaving ? 'Saving…' : saved ? 'Saved!' : 'Save Army'}
+            </button>
+            {listId && shareToken && (
+              <ShareModal
+                listId={listId}
+                shareToken={shareToken}
+                isPublic={isPublic}
+                onTogglePublic={async (pub) => {
+                  await saveList(pub);
+                  setIsPublic(pub);
+                }}
+              />
+            )}
+          </div>
         </div>
       </aside>
     </div>
