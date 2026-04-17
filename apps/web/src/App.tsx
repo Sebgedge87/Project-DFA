@@ -11,6 +11,7 @@ import MyListsPage from './pages/my-lists';
 import ProfilePage from './pages/profile';
 import CommunityPage from './pages/community';
 import SharePage from './pages/share/[token]';
+import RulesPage from './pages/rules';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1 } },
@@ -57,6 +58,7 @@ export default function App() {
               element={<AuthGate><ProfilePage /></AuthGate>}
             />
             <Route path="/community" element={<CommunityPage />} />
+            <Route path="/rules" element={<RulesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -86,17 +86,13 @@ export default function SharePage() {
               <Download size={15} />
               Export Roster
             </button>
-            {faction?.rulebook_url && (
-              <a
-                href={faction.rulebook_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
-              >
-                <BookOpen size={15} />
-                Get the Rulebook
-              </a>
-            )}
+            <Link
+              to="/rules"
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+            >
+              <BookOpen size={15} />
+              View Rules
+            </Link>
             {faction?.store_url && (
               <a
                 href={faction.store_url}

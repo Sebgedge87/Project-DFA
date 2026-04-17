@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb, Scroll } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
 import { calculatePoints, validateArmy } from '@dfa/logic';
 import type { UnitRole } from '@dfa/types';
@@ -10,6 +10,7 @@ import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationAlert } from '../../components/ui/ValidationAlert';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
+import { RosterPanel } from '../../components/ui/RosterPanel';
 import { useWalkthrough } from '../../hooks/useWalkthrough';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -39,6 +40,8 @@ export default function BuilderPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
   const [activeTab, setActiveTab] = useState<'units' | 'faction'>('units');
+  const [rosterOpen, setRosterOpen] = useState(false);
+  const rosterTriggerRef = useRef<HTMLButtonElement>(null);
 
   const { dismissed, dismiss, enable } = useWalkthrough();
 
@@ -221,12 +224,19 @@ export default function BuilderPage() {
 
               {/* Links */}
               <div className="flex flex-wrap gap-2">
-                {faction.rulebook_url && (
-                  <a href={faction.rulebook_url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors">
-                    <BookOpen size={13} /> View Rulebook
-                  </a>
-                )}
+                <Link
+                  to="/rules"
+                  className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors"
+                >
+                  <BookOpen size={13} /> View Rules
+                </Link>
+                <button
+                  ref={rosterTriggerRef}
+                  onClick={() => setRosterOpen(true)}
+                  className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors"
+                >
+                  <Scroll size={13} /> Roster Reference
+                </button>
                 {faction.store_url && (
                   <a href={faction.store_url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2 px-3 py-2 border border-dfa-border rounded text-xs text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted transition-colors">
@@ -353,6 +363,8 @@ export default function BuilderPage() {
           )}
         </div>
       </aside>
+
+      <RosterPanel open={rosterOpen} onClose={() => setRosterOpen(false)} triggerRef={rosterTriggerRef} />
     </div>
   );
 }
