@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useArmyStore } from '../../stores/armyStore';
@@ -8,10 +9,18 @@ export default function ListPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { listId, loadList } = useArmyStore();
+  const [loading, setLoading] = useState(false);
 
-  // Load if not already loaded
-  if (id && listId !== id) {
-    loadList(id).catch(() => navigate('/lists'));
+  useEffect(() => {
+    if (id && listId !== id) {
+      setLoading(true);
+      loadList(id)
+        .catch(() => navigate('/lists'))
+        .finally(() => setLoading(false));
+    }
+  }, [id, listId, loadList, navigate]);
+
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-dfa-text-muted text-sm animate-pulse">Loading army…</p>

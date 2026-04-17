@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Share2, Copy, Check, X, Globe, Lock } from 'lucide-react';
-import { supabase } from '@dfa/supabase-client';
-import { useQueryClient } from '@tanstack/react-query';
-
 interface ShareModalProps {
   listId: string;
   shareToken: string;

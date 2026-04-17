@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
@@ -53,9 +53,11 @@ export default function BuilderPage() {
   const { dismissed, dismiss, enable } = useWalkthrough();
 
   // Sync faction into store when resolved from URL
-  if (faction && entries.length === 0 && !useArmyStore.getState().faction) {
-    setFaction(faction);
-  }
+  useEffect(() => {
+    if (faction && entries.length === 0 && !useArmyStore.getState().faction) {
+      setFaction(faction);
+    }
+  }, [faction, entries.length, setFaction]);
 
   const filteredUnits = useMemo(() => {
     if (!units) return [];
