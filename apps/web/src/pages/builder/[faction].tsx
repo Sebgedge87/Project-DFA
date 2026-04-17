@@ -166,8 +166,8 @@ export default function BuilderPage() {
       </div>
 
       {/* Army sidebar */}
-      <aside className="lg:w-80 xl:w-96 bg-dfa-surface border-t lg:border-t-0 lg:border-l border-dfa-border flex flex-col">
-        <div className="p-4 border-b border-dfa-border space-y-3">
+      <aside className="lg:w-80 xl:w-96 bg-dfa-surface border-t lg:border-t-0 lg:border-l border-dfa-border lg:overflow-y-auto">
+        <div className="sticky top-0 z-10 bg-dfa-surface p-4 border-b border-dfa-border space-y-3">
           <input
             type="text"
             value={listName}
@@ -178,7 +178,7 @@ export default function BuilderPage() {
           {validationErrors.length > 0 && <ValidationAlert errors={validationErrors} />}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div>
           <div className="divide-y divide-dfa-border">
             {entries.length === 0 ? (
               <p className="text-dfa-text-muted text-sm text-center py-10 px-4">

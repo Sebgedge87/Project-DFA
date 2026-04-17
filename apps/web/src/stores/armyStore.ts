@@ -75,10 +75,12 @@ export const useArmyStore = create<ArmyState>()(
         set({ isSaving: true });
         try {
           const pointsTotal = calculatePoints(entries);
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('Not authenticated');
           const { data: list, error: listErr } = await supabase
             .from('army_lists')
             .upsert(
-              { id: listId ?? undefined, name: listName, faction_id: faction.id, points_total: pointsTotal, is_public: isPublic },
+              { id: listId ?? undefined, name: listName, faction_id: faction.id, points_total: pointsTotal, is_public: isPublic, user_id: user.id } as any,
               { onConflict: 'id' },
             )
             .select()
