@@ -26,10 +26,12 @@ export default function HomePage() {
     dismiss();
     setFaction(faction);
     setDetailFaction(null);
+    setPickingFaction(false);
     navigate(`/builder/${faction.slug}`);
   };
 
   const hasArmies = !!myLists?.length;
+  const [pickingFaction, setPickingFaction] = useState(false);
 
   if (isLoading) {
     return (
@@ -61,11 +63,11 @@ export default function HomePage() {
               My Armies
             </h1>
             <button
-              onClick={() => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}
+              onClick={() => { setPickingFaction(p => !p); }}
               className="flex items-center gap-2 px-3 py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded transition-colors"
             >
               <Plus size={15} />
-              New Army
+              {pickingFaction ? 'Cancel' : 'New Army'}
             </button>
           </div>
 
@@ -90,27 +92,28 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Faction selector still accessible via "New Army" flow — show below armies */}
-          <div className="border-t border-dfa-border pt-6 mb-4">
-            <h2 className="font-display text-dfa-text text-xl font-bold uppercase tracking-wide mb-1">
-              Start a New Army
-            </h2>
-            <p className="text-dfa-text-muted text-sm mb-4">Pick a faction to begin building.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {factions?.map(faction => (
-              <FactionCard
-                key={faction.id}
-                faction={faction}
-                onSelect={setDetailFaction}
-                isSelected={selectedFaction?.id === faction.id}
-              />
-            ))}
-          </div>
+          {/* Faction picker — only shown when user explicitly clicks New Army */}
+          {pickingFaction && (
+            <div className="border-t border-dfa-border pt-6 mb-4">
+              <h2 className="font-display text-dfa-text text-xl font-bold uppercase tracking-wide mb-1">
+                Choose a Faction
+              </h2>
+              <p className="text-dfa-text-muted text-sm mb-4">Pick a faction to start your new army.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {factions?.map(faction => (
+                  <FactionCard
+                    key={faction.id}
+                    faction={faction}
+                    onSelect={setDetailFaction}
+                    isSelected={selectedFaction?.id === faction.id}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
-        /* No armies — show faction selector */
+        /* No armies — show faction selector as primary CTA */
         <div>
           <div className="mb-6">
             <h1 className="font-display text-dfa-text text-3xl font-bold uppercase tracking-wide">
