@@ -11,6 +11,8 @@ interface ArmyState {
   entries: ArmyEntry[];
   isDirty: boolean;
   isSaving: boolean;
+  _hasHydrated: boolean;
+  _setHasHydrated: (v: boolean) => void;
   setFaction: (faction: Faction) => void;
   addUnit: (unit: UnitType) => ValidationResult;
   removeUnit: (entryId: string) => void;
@@ -30,8 +32,13 @@ export const useArmyStore = create<ArmyState>()(
       entries: [],
       isDirty: false,
       isSaving: false,
+      _hasHydrated: false,
+      _setHasHydrated: (v) => set({ _hasHydrated: v }),
 
-      setFaction: (faction) => set({ faction, entries: [], isDirty: false, listId: null }),
+      setFaction: (faction) => {
+        localStorage.removeItem('dfa-walkthrough-dismissed');
+        set({ faction, entries: [], isDirty: false, listId: null });
+      },
 
       addUnit: (unit) => {
         const result = validateAddUnit(get().entries, unit);
@@ -122,6 +129,17 @@ export const useArmyStore = create<ArmyState>()(
       resetArmy: () =>
         set({ listId: null, listName: 'My Army', faction: null, entries: [], isDirty: false }),
     }),
-    { name: 'dfa-army-draft' },
+    {
+      name: 'dfa-army-draft',
+      partialize: (state) => ({
+        listId:   state.listId,
+        listName: state.listName,
+        faction:  state.faction,
+        entries:  state.entries,
+      }),
+      onRehydrateStorage: () => (state) => {
+        state?._setHasHydrated(true);
+      },
+    },
   ),
 );

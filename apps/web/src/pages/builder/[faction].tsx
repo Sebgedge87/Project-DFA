@@ -39,7 +39,7 @@ export default function BuilderPage() {
 
   const { data: units, isLoading } = useUnitTypes(faction?.id ?? null);
 
-  const { entries, listName, listId, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction } =
+  const { entries, listName, listId, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction, _hasHydrated } =
     useArmyStore();
   const [isPublic, setIsPublic] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(null);
@@ -52,12 +52,12 @@ export default function BuilderPage() {
 
   const { dismissed, dismiss, enable } = useWalkthrough();
 
-  // Sync faction into store when resolved from URL
+  // Sync faction into store when it resolves from URL, or when navigating to a different faction
   useEffect(() => {
-    if (faction && entries.length === 0 && !useArmyStore.getState().faction) {
+    if (faction && useArmyStore.getState().faction?.id !== faction.id) {
       setFaction(faction);
     }
-  }, [faction, entries.length, setFaction]);
+  }, [faction?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredUnits = useMemo(() => {
     if (!units) return [];
@@ -97,6 +97,8 @@ export default function BuilderPage() {
       setSaveError(e.message ?? 'Save failed');
     }
   };
+
+  if (!_hasHydrated) return null;
 
   if (!faction && factions) {
     return (
