@@ -31,7 +31,7 @@ export default function CommunityPage() {
           Community Armies
         </h1>
         <p className="text-dfa-text-muted text-xs mt-1">
-          Publicly shared army lists from the Death Fields community.
+          Publicly shared army lists from the Death Fields Arena community.
         </p>
       </div>
 

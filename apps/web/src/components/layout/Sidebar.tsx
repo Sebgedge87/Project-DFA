@@ -18,9 +18,8 @@ export function Sidebar({ className = '' }: { className?: string }) {
       {/* Logo */}
       <div className="px-5 py-5 border-b border-dfa-border">
         <span className="font-display text-dfa-red-bright font-bold text-xl tracking-wide uppercase">
-          Death Fields
+          Death Fields Arena
         </span>
-        <p className="text-dfa-text-muted text-xs mt-0.5">Army Builder</p>
       </div>
 
       {/* Nav */}

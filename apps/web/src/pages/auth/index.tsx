@@ -35,7 +35,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="font-display text-dfa-red-bright text-4xl font-bold uppercase tracking-wide">
-            Death Fields
+            Death Fields Arena
           </h1>
           <p className="text-dfa-text-muted text-sm mt-1">Army Builder</p>
         </div>
