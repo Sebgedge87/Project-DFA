@@ -86,10 +86,14 @@ export const useArmyStore = create<ArmyState>()(
             .select()
             .single();
           if (listErr) throw listErr;
-          await supabase.from('army_entries').delete().eq('army_list_id', list.id);
-          await supabase.from('army_entries').insert(
-            entries.map((e) => ({ army_list_id: list.id, unit_type_id: e.unit_type.id, quantity: e.quantity })),
-          );
+          const { error: delErr } = await supabase.from('army_entries').delete().eq('army_list_id', list.id);
+          if (delErr) throw delErr;
+          if (entries.length > 0) {
+            const { error: entriesErr } = await supabase.from('army_entries').insert(
+              entries.map((e) => ({ army_list_id: list.id, unit_type_id: e.unit_type.id, quantity: e.quantity })),
+            );
+            if (entriesErr) throw entriesErr;
+          }
           set({ listId: list.id, isDirty: false });
         } finally {
           set({ isSaving: false });
