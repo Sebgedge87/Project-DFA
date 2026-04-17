@@ -6,14 +6,17 @@ export default function AuthPage() {
   const { user, signInWithGoogle, signInWithDiscord, signInWithMagicLink } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const returnTo = searchParams.get('returnTo') ?? '/';
+  const returnTo = searchParams.get('returnTo') ?? sessionStorage.getItem('auth-return-to') ?? '/';
 
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) navigate(returnTo, { replace: true });
+    if (user) {
+      sessionStorage.removeItem('auth-return-to');
+      navigate(returnTo, { replace: true });
+    }
   }, [user, navigate, returnTo]);
 
   const handleMagicLink = async (e: React.FormEvent) => {

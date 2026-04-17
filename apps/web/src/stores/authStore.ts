@@ -29,18 +29,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signInWithGoogle: async (returnTo?: string) => {
+    if (returnTo) sessionStorage.setItem('auth-return-to', returnTo);
     const base = `${window.location.origin}/auth`;
     const redirectTo = returnTo ? `${base}?returnTo=${encodeURIComponent(returnTo)}` : base;
     await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
   },
 
   signInWithDiscord: async (returnTo?: string) => {
+    if (returnTo) sessionStorage.setItem('auth-return-to', returnTo);
     const base = `${window.location.origin}/auth`;
     const redirectTo = returnTo ? `${base}?returnTo=${encodeURIComponent(returnTo)}` : base;
     await supabase.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo } });
   },
 
   signInWithMagicLink: async (email: string, returnTo?: string) => {
+    if (returnTo) sessionStorage.setItem('auth-return-to', returnTo);
     const base = `${window.location.origin}/auth`;
     const emailRedirectTo = returnTo ? `${base}?returnTo=${encodeURIComponent(returnTo)}` : base;
     const { error } = await supabase.auth.signInWithOtp({
