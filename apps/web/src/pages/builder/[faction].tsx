@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
 import { calculatePoints, validateArmy } from '@dfa/logic';
+import type { ArmyEntry } from '@dfa/types';
 
 import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
@@ -16,7 +17,7 @@ import { useAuthStore } from '../../stores/authStore';
 const ROLES = ['all', 'captain', 'specialist', 'core'] as const;
 type RoleFilter = (typeof ROLES)[number];
 
-function walkthroughHint(entries: ReturnType<typeof useArmyStore>['entries'], isDirty: boolean, listId: string | null): string | null {
+function walkthroughHint(entries: ArmyEntry[], isDirty: boolean, listId: string | null): string | null {
   const hasCaptain = entries.some(e => e.unit_type.role === 'captain');
   const totalModels = entries.reduce((s, e) => s + e.quantity, 0);
   if (!hasCaptain) return 'Start by adding a Captain — every army requires one. Use the role filter to find them quickly.';
