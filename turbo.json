@@ -1,10 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalPassThroughEnv": ["COREPACK_HOME"],
+  "globalPassThroughEnv": ["COREPACK_HOME", "ENABLE_EXPERIMENTAL_COREPACK"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "build/**"]
+      "outputs": ["dist/**", ".next/**", "build/**"],
+      "env": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "VITE_APP_URL"]
     },
     "dev": {
       "cache": false,

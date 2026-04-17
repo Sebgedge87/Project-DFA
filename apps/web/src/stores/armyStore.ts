@@ -2,8 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { validateAddUnit, calculatePoints } from '@dfa/logic';
 import { supabase } from '@dfa/supabase-client';
-import type { Faction, UnitType, ArmyEntry } from '@dfa/types';
-import type { ValidationResult } from '@dfa/logic';
+import type { Faction, UnitType, ArmyEntry, ValidationResult } from '@dfa/types';
 
 interface ArmyState {
   listId: string | null;
