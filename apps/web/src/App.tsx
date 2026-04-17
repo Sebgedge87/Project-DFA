@@ -6,7 +6,6 @@ import { useAuthStore } from './stores/authStore';
 import HomePage from './pages/index';
 import AuthPage from './pages/auth/index';
 import BuilderPage from './pages/builder/[faction]';
-import ListPage from './pages/list/[id]';
 import MyListsPage from './pages/my-lists';
 import ProfilePage from './pages/profile';
 import CommunityPage from './pages/community';
@@ -48,10 +47,6 @@ export default function App() {
             <Route
               path="/lists"
               element={<AuthGate><MyListsPage /></AuthGate>}
-            />
-            <Route
-              path="/list/:id"
-              element={<AuthGate><ListPage /></AuthGate>}
             />
             <Route
               path="/profile"

@@ -1,23 +1,38 @@
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Share2, Copy, Check, X, Globe, Lock } from 'lucide-react';
+
 interface ShareModalProps {
   listId: string;
-  shareToken: string;
+  shareToken: string | null;
   isPublic: boolean;
   onTogglePublic: (isPublic: boolean) => Promise<void>;
+  /** Override the trigger button's className. Defaults to full-width style. */
+  triggerClassName?: string;
 }
 
-export function ShareModal({ listId, shareToken, isPublic, onTogglePublic }: ShareModalProps) {
+const DEFAULT_TRIGGER_CLASS =
+  'w-full flex items-center justify-center gap-2 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors';
+
+export function ShareModal({
+  listId: _listId,
+  shareToken,
+  isPublic,
+  onTogglePublic,
+  triggerClassName = DEFAULT_TRIGGER_CLASS,
+}: ShareModalProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [toggling, setToggling] = useState(false);
-  const shareUrl = `${window.location.origin}/share/${shareToken}`;
+
+  // Only construct share URL when token is available
+  const shareUrl = shareToken ? `${window.location.origin}/share/${shareToken}` : null;
 
   const handleCopy = async () => {
+    if (!shareUrl) return;
     await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1500);
   };
 
   const handleToggle = async () => {
@@ -32,7 +47,7 @@ export function ShareModal({ listId, shareToken, isPublic, onTogglePublic }: Sha
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <button className="w-full flex items-center justify-center gap-2 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors">
+        <button className={triggerClassName}>
           <Share2 size={15} />
           Share
         </button>
@@ -84,29 +99,35 @@ export function ShareModal({ listId, shareToken, isPublic, onTogglePublic }: Sha
             </button>
           </div>
 
-          {/* Share link */}
+          {/* Share link — only shown when public */}
           {isPublic && (
             <div className="space-y-2">
               <p className="text-xs text-dfa-text-muted uppercase tracking-wide font-medium">
                 Share link
               </p>
-              <div className="flex gap-2">
-                <input
-                  id="share-url"
-                  readOnly
-                  aria-label="Share URL"
-                  value={shareUrl}
-                  className="flex-1 bg-dfa-black border border-dfa-border rounded px-3 py-2 text-xs text-dfa-text-muted font-mono focus:outline-none select-all"
-                  onClick={(e) => (e.target as HTMLInputElement).select()}
-                />
-                <button
-                  onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors shrink-0"
-                >
-                  {copied ? <Check size={13} /> : <Copy size={13} />}
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
-              </div>
+              {shareUrl ? (
+                <div className="flex gap-2">
+                  <input
+                    id="share-url"
+                    readOnly
+                    aria-label="Share URL"
+                    value={shareUrl}
+                    className="flex-1 bg-dfa-black border border-dfa-border rounded px-3 py-2 text-xs text-dfa-text-muted font-mono focus:outline-none"
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors shrink-0"
+                  >
+                    {copied ? <Check size={13} /> : <Copy size={13} />}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-xs text-dfa-text-muted italic">
+                  Save your army first to generate a share link.
+                </p>
+              )}
             </div>
           )}
         </Dialog.Content>

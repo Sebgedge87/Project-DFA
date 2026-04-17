@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, ExternalLink, Pencil, Check, X } from 'lucide-react';
 import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLists, useCloneList, supabase } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
+import { useArmyStore } from '../stores/armyStore';
 
 function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string | null; size?: number }) {
   if (src) {
@@ -35,6 +36,7 @@ export default function ProfilePage() {
   const deleteList = useDeleteList();
   const { data: templateLists } = useTemplateLists();
   const cloneList = useCloneList();
+  const { loadList } = useArmyStore();
   const navigate = useNavigate();
 
   const [editing, setEditing] = useState(false);
@@ -98,7 +100,11 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLoad = (id: string) => navigate(`/list/${id}`);
+  const handleLoad = async (id: string) => {
+    await loadList(id);
+    const slug = useArmyStore.getState().faction?.slug;
+    navigate(slug ? `/builder/${slug}` : '/');
+  };
 
   const handleDelete = (id: string) => {
     if (confirm('Delete this army list?')) deleteList.mutate(id);
@@ -354,7 +360,9 @@ export default function ProfilePage() {
                     <button
                       onClick={async () => {
                         const id = await cloneList.mutateAsync({ templateId: tmpl.id, userId: user.id });
-                        navigate(`/list/${id}`);
+                        await loadList(id);
+                        const slug = useArmyStore.getState().faction?.slug;
+                        navigate(slug ? `/builder/${slug}` : '/');
                       }}
                       disabled={cloneList.isPending}
                       className="px-3 py-1.5 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors disabled:opacity-50"

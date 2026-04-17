@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, FileText, Loader2 } from 'lucide-react';
 import { useMyLists, useDeleteList, useToggleListPublic, supabase } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
+import { useArmyStore } from '../stores/armyStore';
 import { ShareModal } from '../components/ui/ShareModal';
 
 async function exportListAsText(listId: string, listName: string) {
@@ -62,12 +63,27 @@ export default function MyListsPage() {
   const { data: lists, isLoading } = useMyLists(user?.id ?? null);
   const deleteList = useDeleteList();
   const togglePublic = useToggleListPublic();
+  const { loadList } = useArmyStore();
   const navigate = useNavigate();
 
   // Track local public state per list (optimistic update while query refetches)
   const [localPublic, setLocalPublic] = useState<Record<string, boolean>>({});
   // Track which lists are currently exporting
   const [exporting, setExporting] = useState<Record<string, boolean>>({});
+  const [loadingEdit, setLoadingEdit] = useState<string | null>(null);
+
+  const handleEdit = async (id: string) => {
+    setLoadingEdit(id);
+    try {
+      await loadList(id);
+      const slug = useArmyStore.getState().faction?.slug;
+      navigate(slug ? `/builder/${slug}` : '/');
+    } catch {
+      navigate('/');
+    } finally {
+      setLoadingEdit(null);
+    }
+  };
 
   const handleDelete = (id: string) => {
     if (confirm('Delete this army list? This cannot be undone.')) {
@@ -143,9 +159,11 @@ export default function MyListsPage() {
                 {/* Action row */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
-                    onClick={() => navigate(`/list/${list.id}`)}
-                    className="px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                    onClick={() => handleEdit(list.id)}
+                    disabled={loadingEdit === list.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors disabled:opacity-50"
                   >
+                    {loadingEdit === list.id && <Loader2 size={12} className="animate-spin" />}
                     Edit
                   </button>
 
@@ -158,6 +176,7 @@ export default function MyListsPage() {
                       setLocalPublic(s => ({ ...s, [list.id]: pub }));
                       await togglePublic.mutateAsync({ id: list.id, isPublic: pub });
                     }}
+                    triggerClassName="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                   />
 
                   {/* Export as text */}
