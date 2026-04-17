@@ -106,55 +106,6 @@ export function useShareList(token: string | null) {
   });
 }
 
-export function useSaveList() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      listId,
-      listName,
-      factionId,
-      entries,
-      isPublic = false,
-    }: {
-      listId: string | null;
-      listName: string;
-      factionId: string;
-      entries: ArmyEntry[];
-      isPublic?: boolean;
-    }) => {
-      const pointsTotal = entries.reduce(
-        (sum, e) => sum + e.unit_type.points * e.quantity,
-        0,
-      );
-      const { data: listRaw, error: listErr } = await supabase
-        .from('army_lists')
-        .upsert(
-          { id: listId ?? undefined, name: listName, faction_id: factionId, points_total: pointsTotal, is_public: isPublic } as any,
-          { onConflict: 'id' },
-        )
-        .select()
-        .single();
-      if (listErr) throw listErr;
-      const list = listRaw as any;
-
-      await supabase.from('army_entries').delete().eq('army_list_id', list.id);
-      const { error: entriesErr } = await supabase.from('army_entries').insert(
-        entries.map((e) => ({
-          army_list_id: list.id,
-          unit_type_id: e.unit_type.id,
-          quantity: e.quantity,
-        })),
-      );
-      if (entriesErr) throw entriesErr;
-      return list as ArmyList;
-    },
-    onSuccess: (list) => {
-      qc.invalidateQueries({ queryKey: ['army_lists', list.user_id] });
-      qc.invalidateQueries({ queryKey: ['army_list', list.id] });
-    },
-  });
-}
-
 export function useTemplateLists() {
   return useQuery<ArmyList[]>({
     queryKey: ['template_lists'],

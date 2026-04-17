@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
@@ -39,7 +39,7 @@ export default function BuilderPage() {
 
   const { data: units, isLoading } = useUnitTypes(faction?.id ?? null);
 
-  const { entries, listName, listId, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction } =
+  const { entries, listName, listId, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction, _hasHydrated } =
     useArmyStore();
   const [isPublic, setIsPublic] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(null);
@@ -52,10 +52,12 @@ export default function BuilderPage() {
 
   const { dismissed, dismiss, enable } = useWalkthrough();
 
-  // Sync faction into store when resolved from URL
-  if (faction && entries.length === 0 && !useArmyStore.getState().faction) {
-    setFaction(faction);
-  }
+  // Sync faction into store when it resolves from URL, or when navigating to a different faction
+  useEffect(() => {
+    if (faction && useArmyStore.getState().faction?.id !== faction.id) {
+      setFaction(faction);
+    }
+  }, [faction?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredUnits = useMemo(() => {
     if (!units) return [];
@@ -95,6 +97,8 @@ export default function BuilderPage() {
       setSaveError(e.message ?? 'Save failed');
     }
   };
+
+  if (!_hasHydrated) return null;
 
   if (!faction && factions) {
     return (
