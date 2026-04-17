@@ -17,10 +17,16 @@ export default function HomePage() {
   const { data: myLists } = useMyLists(user?.id ?? null);
   const { data: templateLists } = useTemplateLists();
   const cloneList = useCloneList();
-  const { faction: selectedFaction, setFaction } = useArmyStore();
+  const { faction: selectedFaction, setFaction, loadList } = useArmyStore();
   const { dismissed, dismiss } = useWalkthrough(user?.id ?? null);
   const navigate = useNavigate();
   const [detailFaction, setDetailFaction] = useState<Faction | null>(null);
+
+  const loadAndNavigate = async (id: string) => {
+    await loadList(id);
+    const slug = useArmyStore.getState().faction?.slug;
+    navigate(slug ? `/builder/${slug}` : '/');
+  };
 
   const handleBuild = (faction: Faction) => {
     dismiss();
@@ -82,7 +88,7 @@ export default function HomePage() {
                   <p className="text-xs text-dfa-gold font-mono mt-0.5">{list.points_total}pts</p>
                 </div>
                 <button
-                  onClick={() => navigate(`/list/${list.id}`)}
+                  onClick={() => loadAndNavigate(list.id)}
                   className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors shrink-0"
                 >
                   <Edit2 size={12} />
@@ -166,7 +172,7 @@ export default function HomePage() {
                     <button
                       onClick={async () => {
                         const id = await cloneList.mutateAsync({ templateId: tmpl.id, userId: user.id });
-                        navigate(`/list/${id}`);
+                        await loadAndNavigate(id);
                       }}
                       disabled={cloneList.isPending}
                       className="px-3 py-1.5 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors disabled:opacity-50"
