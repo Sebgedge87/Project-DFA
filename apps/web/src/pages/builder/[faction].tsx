@@ -260,15 +260,28 @@ export default function BuilderPage() {
                     return (
                       <div key={role}>
                         <p className="text-xs font-bold uppercase tracking-wider text-dfa-text mb-2">{ROLE_LABEL[role]}</p>
+                        {/* Column headers */}
+                        <div className="flex items-center justify-between px-3 pb-1 text-[10px] uppercase tracking-widest text-dfa-text-muted font-medium">
+                          <span>Unit</span>
+                          <div className="flex items-center gap-4 hidden sm:flex">
+                            <span className="w-6 text-center">Act</span>
+                            <span className="w-6 text-center">Mov</span>
+                            <span className="w-6 text-center">HP</span>
+                            <span className="w-10 text-right">Pts</span>
+                          </div>
+                          <span className="sm:hidden w-10 text-right">Pts</span>
+                        </div>
                         <div className="space-y-1">
                           {roleUnits.map(u => (
                             <div key={u.id} className="flex items-center justify-between px-3 py-2 bg-dfa-surface rounded text-sm">
                               <span className="text-dfa-text">{u.name}</span>
                               <div className="flex items-center gap-4 text-xs font-mono">
-                                <span className="text-dfa-text-muted hidden sm:inline">
-                                  {u.actions}A · {u.movement}" · {u.health}HP
+                                <span className="text-dfa-text-muted hidden sm:flex items-center gap-4">
+                                  <span className="w-6 text-center">{u.actions}</span>
+                                  <span className="w-6 text-center">{u.movement}"</span>
+                                  <span className="w-6 text-center">{u.health}</span>
                                 </span>
-                                <span className="text-dfa-gold font-bold">{u.points}pts</span>
+                                <span className="text-dfa-gold font-bold w-10 text-right">{u.points}</span>
                               </div>
                             </div>
                           ))}
