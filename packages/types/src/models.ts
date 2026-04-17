@@ -80,6 +80,7 @@ export interface ArmyList {
   points_total: number;
   is_public: boolean;
   share_token: string;
+  clone_count: number;
   created_at: string;
   updated_at: string;
 }

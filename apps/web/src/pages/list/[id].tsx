@@ -1,45 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { useArmyStore } from '../../stores/armyStore';
-import BuilderPage from '../builder/[faction]';
 
-// Loads a saved list into the army store then delegates to the builder UI
 export default function ListPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { listId, loadList } = useArmyStore();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id && listId !== id) {
-      setLoading(true);
-      loadList(id)
-        .catch(() => navigate('/lists'))
-        .finally(() => setLoading(false));
-    }
-  }, [id, listId, loadList, navigate]);
+    if (!id) { navigate('/profile'); return; }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-dfa-text-muted text-sm animate-pulse">Loading army…</p>
-      </div>
-    );
-  }
+    // Already loaded — just redirect to builder
+    if (listId === id) {
+      const slug = useArmyStore.getState().faction?.slug;
+      navigate(slug ? `/builder/${slug}` : '/', { replace: true });
+      return;
+    }
+
+    setLoading(true);
+    loadList(id)
+      .then(() => {
+        const slug = useArmyStore.getState().faction?.slug;
+        navigate(slug ? `/builder/${slug}` : '/', { replace: true });
+      })
+      .catch(() => navigate('/profile'))
+      .finally(() => setLoading(false));
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!loading) return null;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-dfa-border bg-dfa-surface">
-        <button
-          onClick={() => navigate('/lists')}
-          className="text-dfa-text-muted hover:text-dfa-text transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <span className="text-dfa-text-muted text-sm">My Armies</span>
-      </div>
-      <BuilderPage />
+    <div className="flex items-center justify-center h-64">
+      <p className="text-dfa-text-muted text-sm animate-pulse">Loading army…</p>
     </div>
   );
 }
