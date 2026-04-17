@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFactions } from '@dfa/supabase-client';
 import { FactionCard } from '../components/faction/FactionCard';
+import { FactionDetailModal } from '../components/faction/FactionDetailModal';
 import { WalkthroughBanner } from '../components/ui/WalkthroughBanner';
 import { useWalkthrough } from '../hooks/useWalkthrough';
 import { useArmyStore } from '../stores/armyStore';
@@ -11,10 +13,12 @@ export default function HomePage() {
   const { faction: selectedFaction, setFaction } = useArmyStore();
   const { dismissed, dismiss } = useWalkthrough();
   const navigate = useNavigate();
+  const [detailFaction, setDetailFaction] = useState<Faction | null>(null);
 
-  const handleSelect = (faction: Faction) => {
+  const handleBuild = (faction: Faction) => {
     dismiss();
     setFaction(faction);
+    setDetailFaction(null);
     navigate(`/builder/${faction.slug}`);
   };
 
@@ -48,7 +52,7 @@ export default function HomePage() {
       {!dismissed && (
         <div className="mb-5">
           <WalkthroughBanner
-            message="Welcome to the Army Builder! Pick a faction below to get started. Each faction plays differently — hover a card to read their tagline, then dive in."
+            message="Welcome to the Army Builder! Pick a faction below to get started. Click any card to see the full roster and rules links before committing."
             onDismiss={dismiss}
           />
         </div>
@@ -59,11 +63,18 @@ export default function HomePage() {
           <FactionCard
             key={faction.id}
             faction={faction}
-            onSelect={handleSelect}
+            onSelect={setDetailFaction}
             isSelected={selectedFaction?.id === faction.id}
           />
         ))}
       </div>
+
+      <FactionDetailModal
+        faction={detailFaction}
+        open={!!detailFaction}
+        onOpenChange={open => { if (!open) setDetailFaction(null); }}
+        onBuild={handleBuild}
+      />
     </div>
   );
 }
