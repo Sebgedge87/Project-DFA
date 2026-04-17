@@ -81,14 +81,20 @@ export default function AuthPage() {
             </p>
           ) : (
             <form onSubmit={handleMagicLink} className="space-y-3">
-              <input
-                type="email"
-                required
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 bg-dfa-black border border-dfa-border rounded-md text-sm text-dfa-text placeholder:text-dfa-text-muted focus:outline-none focus:border-dfa-red"
-              />
+              <div>
+                <label htmlFor="magic-link-email" className="block text-xs text-dfa-text-muted mb-1">
+                  Email address
+                </label>
+                <input
+                  id="magic-link-email"
+                  type="email"
+                  required
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-dfa-black border border-dfa-border rounded-md text-sm text-dfa-text placeholder:text-dfa-text-muted focus:outline-none focus:border-dfa-red"
+                />
+              </div>
               {error && <p className="text-xs text-red-400">{error}</p>}
               <button
                 type="submit"

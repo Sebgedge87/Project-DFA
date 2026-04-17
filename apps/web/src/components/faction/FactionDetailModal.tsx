@@ -45,7 +45,7 @@ export function FactionDetailModal({ faction, open, onOpenChange, onBuild }: Fac
                 {faction.name}
               </Dialog.Title>
             </div>
-            <Dialog.Close className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+            <Dialog.Close aria-label="Close" className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
               <X size={20} />
             </Dialog.Close>
           </div>

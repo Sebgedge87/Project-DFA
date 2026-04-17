@@ -161,8 +161,10 @@ export default function BuilderPage() {
               {/* Search + role filter */}
               <div className="flex flex-col sm:flex-row gap-2 mb-4">
                 <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dfa-text-muted pointer-events-none" />
+                  <label htmlFor="unit-search" className="sr-only">Search units</label>
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dfa-text-muted pointer-events-none" aria-hidden="true" />
                   <input
+                    id="unit-search"
                     type="text"
                     placeholder="Search units…"
                     value={search}
@@ -170,7 +172,7 @@ export default function BuilderPage() {
                     className="w-full bg-dfa-surface border border-dfa-border rounded pl-8 pr-8 py-1.5 text-sm text-dfa-text placeholder-dfa-text-muted focus:outline-none focus:border-dfa-red"
                   />
                   {search && (
-                    <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-dfa-text-muted hover:text-dfa-text">
+                    <button onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 text-dfa-text-muted hover:text-dfa-text">
                       <X size={13} />
                     </button>
                   )}
@@ -180,6 +182,7 @@ export default function BuilderPage() {
                     <button
                       key={r}
                       onClick={() => setRoleFilter(r)}
+                      aria-pressed={roleFilter === r}
                       className={`px-3 py-1.5 rounded text-xs font-bold capitalize transition-colors ${
                         roleFilter === r
                           ? 'bg-dfa-red text-white'
@@ -324,16 +327,19 @@ export default function BuilderPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => setQuantity(entry.id, entry.quantity - 1)}
+                    aria-label={`Remove one ${entry.unit_type.name}`}
                     className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors">
                     <Minus size={12} />
                   </button>
-                  <span className="w-5 text-center text-sm text-dfa-text font-mono">{entry.quantity}</span>
+                  <span className="w-5 text-center text-sm text-dfa-text font-mono" aria-label={`${entry.quantity} ${entry.unit_type.name}`}>{entry.quantity}</span>
                   <button onClick={() => addUnit(entry.unit_type)}
+                    aria-label={`Add one ${entry.unit_type.name}`}
                     className="w-7 h-7 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors">
                     <Plus size={12} />
                   </button>
                 </div>
                 <button onClick={() => removeUnit(entry.id)}
+                  aria-label={`Remove ${entry.unit_type.name} from army`}
                   className="text-dfa-text-muted hover:text-red-400 transition-colors ml-1">
                   <Trash2 size={15} />
                 </button>

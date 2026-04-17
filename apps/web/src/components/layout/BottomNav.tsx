@@ -11,7 +11,7 @@ const tabs = [
 
 export function BottomNav({ className = '' }: { className?: string }) {
   return (
-    <nav className={`bg-dfa-surface border-t border-dfa-border ${className}`}>
+    <nav aria-label="Main navigation" className={`bg-dfa-surface border-t border-dfa-border ${className}`}>
       <div className="flex">
         {tabs.map(({ to, label, Icon }) => (
           <NavLink
