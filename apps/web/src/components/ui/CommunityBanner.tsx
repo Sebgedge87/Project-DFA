@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCommunityLists } from '@dfa/supabase-client';
-import { Download, ExternalLink } from 'lucide-react';
+import { useCommunityLists, useFavourites, useToggleFavourite } from '@dfa/supabase-client';
+import { Download, ExternalLink, Star } from 'lucide-react';
+import { useAuthStore } from '../../stores/authStore';
 
 export function CommunityBanner() {
   const { data: lists } = useCommunityLists(10);
   const [active, setActive] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const { data: favs } = useFavourites(user?.id ?? null);
+  const toggleFav = useToggleFavourite();
 
   useEffect(() => {
     if (!lists?.length) return;
@@ -52,7 +56,22 @@ export function CommunityBanner() {
             <div className="flex items-center gap-1 mt-2 text-dfa-text-muted">
               <Download size={10} />
               <span className="text-[10px]">{list.clone_count ?? 0}</span>
-              <ExternalLink size={10} className="ml-auto" />
+              <div className="ml-auto flex items-center gap-1.5">
+                {user && (
+                  <button
+                    onClick={e => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFav.mutate({ userId: user.id, listId: list.id, isFav: favs?.has(list.id) ?? false });
+                    }}
+                    className={`transition-colors ${favs?.has(list.id) ? 'text-dfa-gold' : 'hover:text-dfa-gold'}`}
+                    title={favs?.has(list.id) ? 'Unfavourite' : 'Favourite'}
+                  >
+                    <Star size={10} fill={favs?.has(list.id) ? 'currentColor' : 'none'} />
+                  </button>
+                )}
+                <ExternalLink size={10} />
+              </div>
             </div>
           </a>
         ))}
