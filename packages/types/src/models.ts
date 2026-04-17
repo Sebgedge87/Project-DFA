@@ -92,4 +92,5 @@ export interface Profile {
   avatar_url: string | null;
   bio: string | null;
   discord_id: string | null;
+  has_completed_walkthrough: boolean;
 }

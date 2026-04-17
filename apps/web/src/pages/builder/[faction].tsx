@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb, Scroll } from 'lucide-react';
+import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb, Scroll, HelpCircle } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
 import { calculatePoints, validateArmy } from '@dfa/logic';
 import type { UnitRole } from '@dfa/types';
@@ -11,6 +11,7 @@ import { ValidationAlert } from '../../components/ui/ValidationAlert';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
 import { RosterPanel } from '../../components/ui/RosterPanel';
+import { WalkthroughPanel } from '../../components/ui/WalkthroughPanel';
 import { useWalkthrough } from '../../hooks/useWalkthrough';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -43,7 +44,14 @@ export default function BuilderPage() {
   const [rosterOpen, setRosterOpen] = useState(false);
   const rosterTriggerRef = useRef<HTMLButtonElement>(null);
 
-  const { dismissed, dismiss, enable } = useWalkthrough();
+  const walkthroughTriggerRef = useRef<HTMLButtonElement>(null);
+  const {
+    dismissed, dismiss, enable,
+    isOpen: walkthroughOpen, currentStep, selectedUnit,
+    open: openWalkthrough, close: closeWalkthrough,
+    nextStep, prevStep, selectUnit, clearUnit, complete,
+    isSavingComplete,
+  } = useWalkthrough(user?.id ?? null);
 
   // Sync faction into store when it resolves from URL, or when navigating to a different faction
   useEffect(() => {
@@ -84,6 +92,18 @@ export default function BuilderPage() {
     }
   };
 
+  const handleWalkthroughFinish = async () => {
+    if (!user) { navigate(`/auth?returnTo=${encodeURIComponent(`/builder/${factionSlug}`)}`); return; }
+    try {
+      await saveList(isPublic);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      // Walkthrough completes client-side even if save fails
+    }
+    await complete();
+  };
+
   if (!_hasHydrated) return null;
 
   if (!faction && factions) {
@@ -114,22 +134,36 @@ export default function BuilderPage() {
             </div>
           </div>
 
-          {/* Guide toggle */}
-          <button
-            onClick={() => dismissed ? enable() : dismiss()}
-            title={dismissed ? 'Enable guided mode' : 'Disable guided mode'}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-bold transition-colors ${
-              !dismissed
-                ? 'bg-dfa-red/10 border-dfa-red/40 text-dfa-red'
-                : 'bg-dfa-surface border-dfa-border text-dfa-text-muted hover:text-dfa-text'
-            }`}
-          >
-            <Lightbulb size={13} />
-            Guide {dismissed ? 'Off' : 'On'}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Guide progress bar toggle */}
+            <button
+              onClick={() => dismissed ? enable() : dismiss()}
+              title={dismissed ? 'Enable guided mode' : 'Disable guided mode'}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-bold transition-colors ${
+                !dismissed
+                  ? 'bg-dfa-red/10 border-dfa-red/40 text-dfa-red'
+                  : 'bg-dfa-surface border-dfa-border text-dfa-text-muted hover:text-dfa-text'
+              }`}
+            >
+              <Lightbulb size={13} />
+              Guide {dismissed ? 'Off' : 'On'}
+            </button>
+
+            {/* New player guide panel trigger — always visible */}
+            <button
+              ref={walkthroughTriggerRef}
+              onClick={openWalkthrough}
+              title="New player guide"
+              aria-label="Open new player guide"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-dfa-border bg-dfa-surface text-dfa-text-muted hover:text-dfa-text text-xs font-bold transition-colors"
+            >
+              <HelpCircle size={13} />
+              <span className="hidden sm:inline">Guide</span>
+            </button>
+          </div>
         </div>
 
-        {/* Guided hint */}
+        {/* Guided hint bar */}
         {!dismissed && (
           <div className="px-4 md:px-6 pt-3 shrink-0">
             <GuidedSteps entries={entries} isDirty={isDirty} listId={listId} onDismiss={dismiss} />
@@ -203,7 +237,15 @@ export default function BuilderPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {filteredUnits.map(unit => {
                     const entry = entries.find(e => e.unit_type.id === unit.id);
-                    return <UnitCard key={unit.id} unit={unit} onAdd={addUnit} quantity={entry?.quantity ?? 0} />;
+                    return (
+                      <UnitCard
+                        key={unit.id}
+                        unit={unit}
+                        onAdd={addUnit}
+                        quantity={entry?.quantity ?? 0}
+                        onSelect={walkthroughOpen ? selectUnit : undefined}
+                      />
+                    );
                   })}
                 </div>
               )}
@@ -371,6 +413,22 @@ export default function BuilderPage() {
       </aside>
 
       <RosterPanel open={rosterOpen} onClose={() => setRosterOpen(false)} triggerRef={rosterTriggerRef} />
+
+      <WalkthroughPanel
+        open={walkthroughOpen}
+        currentStep={currentStep}
+        selectedUnit={selectedUnit}
+        faction={faction ?? null}
+        entries={entries}
+        listName={listName}
+        isSaving={isSaving || isSavingComplete}
+        onClose={closeWalkthrough}
+        onNextStep={nextStep}
+        onPrevStep={prevStep}
+        onClearUnit={clearUnit}
+        onFinish={handleWalkthroughFinish}
+        triggerRef={walkthroughTriggerRef}
+      />
     </div>
   );
 }

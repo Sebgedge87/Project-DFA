@@ -8,12 +8,13 @@ import { WeaponTable } from './WeaponTable';
 import { RoleBadge } from './RoleBadge';
 
 interface UnitCardProps {
-  unit:      UnitType;
-  onAdd:     (unit: UnitType) => ValidationResult;
-  quantity?: number;
+  unit:       UnitType;
+  onAdd:      (unit: UnitType) => ValidationResult;
+  quantity?:  number;
+  onSelect?:  (unit: UnitType) => void;
 }
 
-export function UnitCard({ unit, onAdd, quantity = 0 }: UnitCardProps) {
+export function UnitCard({ unit, onAdd, quantity = 0, onSelect }: UnitCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [error, setError]       = useState<string | null>(null);
 
@@ -23,45 +24,59 @@ export function UnitCard({ unit, onAdd, quantity = 0 }: UnitCardProps) {
     else setError(null);
   };
 
+  // Top section is a button when the walkthrough guide wants unit detail clicks
+  const TopTag = onSelect ? 'button' : 'div';
+
   return (
     <motion.div
       className="bg-dfa-surface border border-dfa-border rounded-lg overflow-hidden"
       whileHover={{ borderColor: '#8B1A1A' }}
       layout
     >
-      {/* Unit image */}
-      <div className="relative h-32 bg-dfa-black">
-        {unit.image_url ? (
-          <img
-            src={unit.image_url}
-            alt={unit.name}
-            className="w-full h-full object-contain p-2"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center opacity-20">
-            <span className="text-4xl">⚔</span>
-          </div>
-        )}
-        <span className="absolute top-2 right-2 text-xs font-mono text-dfa-gold font-bold">
-          {unit.points}pts
-        </span>
-        <RoleBadge role={unit.role} />
-      </div>
+      {/* Clickable top section (image + stats) — activates when walkthrough is open */}
+      <TopTag
+        {...(onSelect
+          ? {
+              onClick: () => onSelect(unit),
+              'aria-label': `View ${unit.name} details in guide`,
+              className: 'block w-full text-left hover:bg-dfa-surface-raised transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-dfa-red',
+            }
+          : {})}
+      >
+        {/* Unit image */}
+        <div className="relative h-32 bg-dfa-black">
+          {unit.image_url ? (
+            <img
+              src={unit.image_url}
+              alt={unit.name}
+              className="w-full h-full object-contain p-2"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center opacity-20">
+              <span className="text-4xl">⚔</span>
+            </div>
+          )}
+          <span className="absolute top-2 right-2 text-xs font-mono text-dfa-gold font-bold">
+            {unit.points}pts
+          </span>
+          <RoleBadge role={unit.role} />
+        </div>
 
-      {/* Name + stat block */}
-      <div className="p-3">
-        <h3 className="font-display text-dfa-text font-bold text-lg leading-tight mb-2">
-          {unit.name}
-        </h3>
-        <StatBlock
-          actions={unit.actions}
-          movement={unit.movement}
-          melee_attack={unit.melee_attack}
-          ranged_attack={unit.ranged_attack}
-          defence={unit.defence}
-          health={unit.health}
-        />
-      </div>
+        {/* Name + stat block */}
+        <div className="p-3">
+          <h3 className="font-display text-dfa-text font-bold text-lg leading-tight mb-2">
+            {unit.name}
+          </h3>
+          <StatBlock
+            actions={unit.actions}
+            movement={unit.movement}
+            melee_attack={unit.melee_attack}
+            ranged_attack={unit.ranged_attack}
+            defence={unit.defence}
+            health={unit.health}
+          />
+        </div>
+      </TopTag>
 
       {/* Expandable abilities + weapons */}
       <button
