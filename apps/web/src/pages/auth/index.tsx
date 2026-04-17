@@ -1,23 +1,26 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 
 export default function AuthPage() {
   const { user, signInWithGoogle, signInWithDiscord, signInWithMagicLink } = useAuthStore();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('returnTo') ?? '/';
+
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) navigate('/', { replace: true });
-  }, [user, navigate]);
+    if (user) navigate(returnTo, { replace: true });
+  }, [user, navigate, returnTo]);
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
-      await signInWithMagicLink(email);
+      await signInWithMagicLink(email, returnTo !== '/' ? returnTo : undefined);
       setSent(true);
     } catch (err: any) {
       setError(err.message ?? 'Something went wrong');
@@ -38,7 +41,7 @@ export default function AuthPage() {
           <h2 className="font-display text-dfa-text text-xl font-bold">Sign in</h2>
 
           <button
-            onClick={signInWithGoogle}
+            onClick={() => signInWithGoogle(returnTo !== '/' ? returnTo : undefined)}
             className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-md bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -51,7 +54,7 @@ export default function AuthPage() {
           </button>
 
           <button
-            onClick={signInWithDiscord}
+            onClick={() => signInWithDiscord(returnTo !== '/' ? returnTo : undefined)}
             className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-md bg-[#5865F2] text-white text-sm font-semibold hover:bg-[#4752C4] transition-colors"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

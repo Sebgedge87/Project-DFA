@@ -79,7 +79,7 @@ export default function BuilderPage() {
   const hint = walkthroughHint(entries, isDirty, listId);
 
   const handleSave = async () => {
-    if (!user) { navigate('/auth'); return; }
+    if (!user) { navigate(`/auth?returnTo=${encodeURIComponent(`/builder/${factionSlug}`)}`); return; }
     setSaveError(null);
     try {
       await saveList(isPublic);

@@ -6,9 +6,9 @@ interface AuthState {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signInWithDiscord: () => Promise<void>;
-  signInWithMagicLink: (email: string) => Promise<void>;
+  signInWithGoogle: (returnTo?: string) => Promise<void>;
+  signInWithDiscord: (returnTo?: string) => Promise<void>;
+  signInWithMagicLink: (email: string, returnTo?: string) => Promise<void>;
   signOut: () => Promise<void>;
   init: () => () => void;
 }
@@ -28,24 +28,24 @@ export const useAuthStore = create<AuthState>((set) => ({
     return () => subscription.unsubscribe();
   },
 
-  signInWithGoogle: async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth` },
-    });
+  signInWithGoogle: async (returnTo?: string) => {
+    const base = `${window.location.origin}/auth`;
+    const redirectTo = returnTo ? `${base}?returnTo=${encodeURIComponent(returnTo)}` : base;
+    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
   },
 
-  signInWithDiscord: async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'discord',
-      options: { redirectTo: `${window.location.origin}/auth` },
-    });
+  signInWithDiscord: async (returnTo?: string) => {
+    const base = `${window.location.origin}/auth`;
+    const redirectTo = returnTo ? `${base}?returnTo=${encodeURIComponent(returnTo)}` : base;
+    await supabase.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo } });
   },
 
-  signInWithMagicLink: async (email: string) => {
+  signInWithMagicLink: async (email: string, returnTo?: string) => {
+    const base = `${window.location.origin}/auth`;
+    const emailRedirectTo = returnTo ? `${base}?returnTo=${encodeURIComponent(returnTo)}` : base;
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth` },
+      options: { emailRedirectTo },
     });
     if (error) throw error;
   },
