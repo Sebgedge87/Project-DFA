@@ -183,7 +183,7 @@ export function useCommunityLists(limit = 10) {
         .order('updated_at', { ascending: false })
         .limit(limit);
       if (error) throw error;
-      return data as (ArmyList & { faction: { color_primary: string; name: string } | null })[];
+      return data as unknown as (ArmyList & { faction: { color_primary: string; name: string } | null })[];
     },
     staleTime: 1000 * 60 * 5,
   });
