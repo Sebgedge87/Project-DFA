@@ -18,7 +18,7 @@ export default function HomePage() {
   const { data: templateLists } = useTemplateLists();
   const cloneList = useCloneList();
   const { faction: selectedFaction, setFaction } = useArmyStore();
-  const { dismissed, dismiss } = useWalkthrough();
+  const { dismissed, dismiss } = useWalkthrough(user?.id ?? null);
   const navigate = useNavigate();
   const [detailFaction, setDetailFaction] = useState<Faction | null>(null);
 
