@@ -1,6 +1,6 @@
 {
-  "installCommand": "npx --yes pnpm@9.15.0 install --no-frozen-lockfile",
-  "buildCommand": "npx pnpm@9.15.0 turbo build --filter=@dfa/web...",
+  "installCommand": "npm install -g pnpm@9.15.0 && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm turbo build --filter=@dfa/web...",
   "outputDirectory": "apps/web/dist",
   "framework": null
 }
