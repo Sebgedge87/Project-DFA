@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import type { Faction } from '@dfa/types';
 
 interface FactionCardProps {
-  faction:    Faction;
-  onSelect:   (faction: Faction) => void;
-  isSelected?: boolean;
+  faction:      Faction;
+  onSelect:     (faction: Faction) => void;
+  isSelected?:  boolean;
 }
 
 export function FactionCard({ faction, onSelect, isSelected = false }: FactionCardProps) {
@@ -20,11 +20,7 @@ export function FactionCard({ faction, onSelect, isSelected = false }: FactionCa
       {/* Hero image */}
       <div className="h-40 bg-dfa-black overflow-hidden">
         {faction.image_url ? (
-          <img
-            src={faction.image_url}
-            alt={faction.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={faction.image_url} alt={faction.name} className="w-full h-full object-cover" />
         ) : (
           <div
             className="w-full h-full flex items-end p-3"
@@ -45,34 +41,19 @@ export function FactionCard({ faction, onSelect, isSelected = false }: FactionCa
           <p className="text-dfa-gold text-xs font-medium mb-2">{faction.tagline}</p>
         )}
         {faction.lore && (
-          <p className="text-dfa-text-muted text-xs leading-relaxed line-clamp-2">
-            {faction.lore}
-          </p>
+          <p className="text-dfa-text-muted text-xs leading-relaxed line-clamp-2">{faction.lore}</p>
         )}
 
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={e => { e.stopPropagation(); onSelect(faction); }}
-            className={`flex-1 py-2 text-sm font-bold rounded transition-colors ${
-              isSelected
-                ? 'bg-dfa-red-bright text-white cursor-default'
-                : 'bg-dfa-red hover:bg-dfa-red-bright text-white'
-            }`}
-          >
-            {isSelected ? 'Selected' : 'Build Army'}
-          </button>
-          {faction.store_url && (
-            <a
-              href={faction.store_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              className="px-3 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted text-sm rounded transition-colors whitespace-nowrap"
-            >
-              Buy Miniatures
-            </a>
-          )}
-        </div>
+        <button
+          onClick={e => { e.stopPropagation(); onSelect(faction); }}
+          className={`mt-4 w-full py-2 text-sm font-bold rounded transition-colors ${
+            isSelected
+              ? 'bg-dfa-red-bright text-white cursor-default'
+              : 'bg-dfa-surface border border-dfa-border text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted'
+          }`}
+        >
+          {isSelected ? 'Selected' : 'View Details →'}
+        </button>
       </div>
     </motion.div>
   );
