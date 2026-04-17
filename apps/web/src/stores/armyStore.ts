@@ -9,6 +9,7 @@ interface ArmyState {
   listName: string;
   faction: Faction | null;
   entries: ArmyEntry[];
+  shareToken: string | null;
   isDirty: boolean;
   isSaving: boolean;
   _hasHydrated: boolean;
@@ -30,6 +31,7 @@ export const useArmyStore = create<ArmyState>()(
       listName: 'My Army',
       faction: null,
       entries: [],
+      shareToken: null,
       isDirty: false,
       isSaving: false,
       _hasHydrated: false,
@@ -37,7 +39,7 @@ export const useArmyStore = create<ArmyState>()(
 
       setFaction: (faction) => {
         localStorage.removeItem('dfa-walkthrough-dismissed');
-        set({ faction, entries: [], isDirty: false, listId: null });
+        set({ faction, entries: [], isDirty: false, listId: null, shareToken: null });
       },
 
       addUnit: (unit) => {
@@ -101,7 +103,7 @@ export const useArmyStore = create<ArmyState>()(
             );
             if (entriesErr) throw entriesErr;
           }
-          set({ listId: list.id, isDirty: false });
+          set({ listId: list.id, shareToken: list.share_token ?? null, isDirty: false });
         } finally {
           set({ isSaving: false });
         }
@@ -123,19 +125,20 @@ export const useArmyStore = create<ArmyState>()(
             unit_weapons: undefined,
           },
         }));
-        set({ listId: data.id, listName: data.name, faction: data.faction, entries, isDirty: false });
+        set({ listId: data.id, listName: data.name, faction: data.faction, entries, shareToken: data.share_token ?? null, isDirty: false });
       },
 
       resetArmy: () =>
-        set({ listId: null, listName: 'My Army', faction: null, entries: [], isDirty: false }),
+        set({ listId: null, listName: 'My Army', faction: null, entries: [], shareToken: null, isDirty: false }),
     }),
     {
       name: 'dfa-army-draft',
       partialize: (state) => ({
-        listId:   state.listId,
-        listName: state.listName,
-        faction:  state.faction,
-        entries:  state.entries,
+        listId:     state.listId,
+        listName:   state.listName,
+        faction:    state.faction,
+        entries:    state.entries,
+        shareToken: state.shareToken,
       }),
       onRehydrateStorage: () => (state) => {
         state?._setHasHydrated(true);

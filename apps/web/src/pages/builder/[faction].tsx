@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
 import { calculatePoints, validateArmy } from '@dfa/logic';
-import type { ArmyEntry, UnitRole } from '@dfa/types';
+import type { UnitRole } from '@dfa/types';
 
 import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationAlert } from '../../components/ui/ValidationAlert';
 import { ShareModal } from '../../components/ui/ShareModal';
-import { WalkthroughBanner } from '../../components/ui/WalkthroughBanner';
+import { GuidedSteps } from '../../components/ui/GuidedSteps';
 import { useWalkthrough } from '../../hooks/useWalkthrough';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -20,15 +20,6 @@ type RoleFilter = (typeof ROLES)[number];
 const ROLE_ORDER: UnitRole[] = ['captain', 'specialist', 'core'];
 const ROLE_LABEL: Record<UnitRole, string> = { captain: 'Captains', specialist: 'Specialists', core: 'Core' };
 
-function walkthroughHint(entries: ArmyEntry[], isDirty: boolean, listId: string | null): string {
-  const hasCaptain = entries.some(e => e.unit_type.role === 'captain');
-  const totalModels = entries.reduce((s, e) => s + e.quantity, 0);
-  if (!hasCaptain) return 'Start by adding a Captain — every army requires one. Filter by "Captain" to find them.';
-  if (totalModels < 5) return 'Captain added! Fill your roster with Specialists and Core units. You need at least 5 models total.';
-  if (isDirty && !listId) return "Looking good! Hit Save Army when you're happy with your list.";
-  if (isDirty) return 'You have unsaved changes — hit Save Army to lock them in.';
-  return 'Army saved! You can share it or keep building.';
-}
 
 export default function BuilderPage() {
   const { faction: factionSlug } = useParams<{ faction: string }>();
@@ -39,10 +30,9 @@ export default function BuilderPage() {
 
   const { data: units, isLoading } = useUnitTypes(faction?.id ?? null);
 
-  const { entries, listName, listId, isDirty, isSaving, addUnit, removeUnit, setQuantity, setName, saveList, setFaction, _hasHydrated } =
+  const { entries, listName, listId, isDirty, isSaving, shareToken, addUnit, removeUnit, setQuantity, setName, saveList, setFaction, _hasHydrated } =
     useArmyStore();
   const [isPublic, setIsPublic] = useState(false);
-  const [shareToken, setShareToken] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -78,19 +68,12 @@ export default function BuilderPage() {
 
   const points = calculatePoints(entries);
   const validationErrors = validateArmy(entries).map((r) => r.error!).filter(Boolean);
-  const hint = walkthroughHint(entries, isDirty, listId);
 
   const handleSave = async () => {
     if (!user) { navigate(`/auth?returnTo=${encodeURIComponent(`/builder/${factionSlug}`)}`); return; }
     setSaveError(null);
     try {
       await saveList(isPublic);
-      const id = useArmyStore.getState().listId;
-      if (id && !shareToken) {
-        const { supabase } = await import('@dfa/supabase-client');
-        const { data } = await supabase.from('army_lists').select('share_token').eq('id', id).single();
-        if (data?.share_token) setShareToken(data.share_token);
-      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e: any) {
@@ -146,7 +129,7 @@ export default function BuilderPage() {
         {/* Guided hint */}
         {!dismissed && (
           <div className="px-4 md:px-6 pt-3 shrink-0">
-            <WalkthroughBanner message={hint} onDismiss={dismiss} />
+            <GuidedSteps entries={entries} isDirty={isDirty} listId={listId} onDismiss={dismiss} />
           </div>
         )}
 

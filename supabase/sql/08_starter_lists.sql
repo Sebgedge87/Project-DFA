@@ -13,11 +13,22 @@ alter table public.army_lists
   add column if not exists is_template boolean not null default false;
 
 -- Allow anyone to read entries belonging to a public list
-create policy if not exists "Public list entries readable"
-  on public.army_entries for select
-  using (
-    army_list_id in (select id from public.army_lists where is_public = true)
-  );
+do $$ begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'army_entries'
+      and policyname = 'Public list entries readable'
+  ) then
+    execute $p$
+      create policy "Public list entries readable"
+        on public.army_entries for select
+        using (
+          army_list_id in (select id from public.army_lists where is_public = true)
+        )
+    $p$;
+  end if;
+end $$;
 
 -- ── Template army lists ───────────────────────────────────────────────────────
 

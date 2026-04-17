@@ -3,3 +3,4 @@ export * from './queries/factions';
 export * from './queries/units';
 export * from './queries/lists';
 export * from './queries/profile';
+export * from './queries/favourites';
