@@ -58,9 +58,6 @@ export default function HomePage() {
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto">
 
-      {/* Community scrolling banner — always at top */}
-      <CommunityBanner />
-
       {/* My Armies — shown when user has saved armies */}
       {hasArmies ? (
         <div>
@@ -69,7 +66,7 @@ export default function HomePage() {
               My Armies
             </h1>
             <button
-              onClick={() => { setPickingFaction(p => !p); }}
+              onClick={() => { setPickingFaction(p => !p); if (!pickingFaction) window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}
               className="flex items-center gap-2 px-3 py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded transition-colors"
             >
               <Plus size={15} />
@@ -149,6 +146,10 @@ export default function HomePage() {
               />
             ))}
           </div>
+
+          <div className="mt-8">
+            <CommunityBanner />
+          </div>
         </div>
       )}
 
@@ -184,6 +185,12 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {hasArmies && (
+        <div className="mt-8">
+          <CommunityBanner />
         </div>
       )}
 
