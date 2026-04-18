@@ -17,8 +17,8 @@ export function RosterPanel({ open, onClose, triggerRef }: RosterPanelProps) {
 
   useEffect(() => {
     if (!open) return;
-    fetch(ROSTER_PDF_URL, { method: 'HEAD' })
-      .then(r => setPdfAvailable(r.ok))
+    fetch(ROSTER_PDF_URL, { method: 'GET', headers: { Range: 'bytes=0-0' } })
+      .then(r => setPdfAvailable(r.ok || r.status === 206))
       .catch(() => setPdfAvailable(false));
   }, [open]);
 
