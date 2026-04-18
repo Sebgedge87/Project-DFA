@@ -4,6 +4,7 @@ import { Plus, Trash2, ExternalLink, Pencil, Check, X } from 'lucide-react';
 import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLists, useCloneList, supabase } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
 import { useArmyStore } from '../stores/armyStore';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string | null; size?: number }) {
   if (src) {
@@ -39,6 +40,7 @@ export default function ProfilePage() {
   const { loadList } = useArmyStore();
   const navigate = useNavigate();
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
@@ -106,9 +108,7 @@ export default function ProfilePage() {
     navigate(slug ? `/builder/${slug}` : '/');
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Delete this army list?')) deleteList.mutate(id);
-  };
+  const handleDelete = (id: string) => setConfirmDeleteId(id);
 
   const displayedName = profile?.display_name || profile?.username || user?.email?.split('@')[0] || 'Commander';
   const avatarUrl = profile?.avatar_url ?? (user?.user_metadata?.avatar_url as string | undefined);
@@ -377,6 +377,16 @@ export default function ProfilePage() {
         </div>
       )}
 
+      <ConfirmDialog
+        open={confirmDeleteId !== null}
+        title="Delete army?"
+        description="This army list will be permanently deleted. This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Keep it"
+        destructive
+        onConfirm={() => { if (confirmDeleteId) deleteList.mutate(confirmDeleteId); setConfirmDeleteId(null); }}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }
