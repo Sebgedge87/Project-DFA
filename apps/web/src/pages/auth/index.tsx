@@ -66,44 +66,46 @@ export default function AuthPage() {
             Continue with Discord
           </button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-dfa-border" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-dfa-surface px-2 text-dfa-text-muted">or magic link</span>
-            </div>
-          </div>
-
-          {sent ? (
-            <p className="text-center text-sm text-dfa-gold">
-              Check your email — link sent to {email}
-            </p>
-          ) : (
-            <form onSubmit={handleMagicLink} className="space-y-3">
-              <div>
-                <label htmlFor="magic-link-email" className="block text-xs text-dfa-text-muted mb-1">
-                  Email address
-                </label>
-                <input
-                  id="magic-link-email"
-                  type="email"
-                  required
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 bg-dfa-black border border-dfa-border rounded-md text-sm text-dfa-text placeholder:text-dfa-text-muted focus:outline-none focus:border-dfa-red"
-                />
+          <div className="opacity-80 scale-[0.98] origin-top transition-all">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-dfa-border" />
               </div>
-              {error && <p className="text-xs text-red-400">{error}</p>}
-              <button
-                type="submit"
-                className="w-full py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded-md transition-colors"
-              >
-                Send magic link
-              </button>
-            </form>
-          )}
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-dfa-surface px-2 text-dfa-text-muted">or magic link</span>
+              </div>
+            </div>
+
+            {sent ? (
+              <p className="text-center text-sm text-dfa-gold mt-3">
+                Check your email — link sent to {email}
+              </p>
+            ) : (
+              <form onSubmit={handleMagicLink} className="space-y-3 mt-3">
+                <div>
+                  <label htmlFor="magic-link-email" className="block text-xs text-dfa-text-muted mb-1">
+                    Email address
+                  </label>
+                  <input
+                    id="magic-link-email"
+                    type="email"
+                    required
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 bg-dfa-black border border-dfa-border rounded-md text-sm text-dfa-text placeholder:text-dfa-text-muted focus:outline-none focus:border-dfa-red"
+                  />
+                </div>
+                {error && <p className="text-xs text-red-400">{error}</p>}
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded-md transition-colors"
+                >
+                  Send magic link
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, FileText } from 'lucide-react';
+import { BookOpen, FileText, Copy } from 'lucide-react';
 import { useShareList } from '@dfa/supabase-client';
 import { StatBlock } from '../../components/unit/StatBlock';
 import { WeaponTable } from '../../components/unit/WeaponTable';
@@ -63,6 +63,14 @@ export default function SharePage() {
             >
               Build My Own
             </Link>
+
+            <button
+              onClick={() => navigator.clipboard.writeText(window.location.href)}
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+            >
+              <Copy size={15} />
+              Copy Link
+            </button>
 
             <button
               onClick={handleExport}
