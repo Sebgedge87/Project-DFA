@@ -11,8 +11,8 @@ import { ValidationAlert } from '../../components/ui/ValidationAlert';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
 import { RosterPanel } from '../../components/ui/RosterPanel';
-import { WalkthroughPanel } from '../../components/ui/WalkthroughPanel';
 import { useWalkthrough } from '../../hooks/useWalkthrough';
+import { useWalkthroughStore } from '../../stores/walkthroughStore';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -44,14 +44,8 @@ export default function BuilderPage() {
   const [rosterOpen, setRosterOpen] = useState(false);
   const rosterTriggerRef = useRef<HTMLButtonElement>(null);
 
-  const walkthroughTriggerRef = useRef<HTMLButtonElement>(null);
-  const {
-    dismissed, dismiss, enable,
-    isOpen: walkthroughOpen, currentStep, selectedUnit,
-    open: openWalkthrough, close: closeWalkthrough,
-    nextStep, prevStep, selectUnit, clearUnit, complete,
-    isSavingComplete,
-  } = useWalkthrough(user?.id ?? null);
+  const { dismissed, dismiss, enable } = useWalkthrough(user?.id ?? null);
+  const openWalkthrough = useWalkthroughStore(s => s.open);
 
   // Sync faction into store when it resolves from URL, or when navigating to a different faction
   useEffect(() => {
@@ -90,18 +84,6 @@ export default function BuilderPage() {
     } catch (e: any) {
       setSaveError(e.message ?? 'Save failed');
     }
-  };
-
-  const handleWalkthroughFinish = async () => {
-    if (!user) { navigate(`/auth?returnTo=${encodeURIComponent(`/builder/${factionSlug}`)}`); return; }
-    try {
-      await saveList(isPublic);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch {
-      // Walkthrough completes client-side even if save fails
-    }
-    await complete();
   };
 
   if (!_hasHydrated) return null;
@@ -149,9 +131,8 @@ export default function BuilderPage() {
               Guide {dismissed ? 'Off' : 'On'}
             </button>
 
-            {/* New player guide panel trigger — always visible */}
+            {/* New player guide — opens walkthrough modal */}
             <button
-              ref={walkthroughTriggerRef}
               onClick={openWalkthrough}
               title="New player guide"
               aria-label="Open new player guide"
@@ -243,7 +224,6 @@ export default function BuilderPage() {
                         unit={unit}
                         onAdd={addUnit}
                         quantity={entry?.quantity ?? 0}
-                        onSelect={walkthroughOpen ? selectUnit : undefined}
                       />
                     );
                   })}
@@ -413,22 +393,6 @@ export default function BuilderPage() {
       </aside>
 
       <RosterPanel open={rosterOpen} onClose={() => setRosterOpen(false)} triggerRef={rosterTriggerRef} />
-
-      <WalkthroughPanel
-        open={walkthroughOpen}
-        currentStep={currentStep}
-        selectedUnit={selectedUnit}
-        faction={faction ?? null}
-        entries={entries}
-        listName={listName}
-        isSaving={isSaving || isSavingComplete}
-        onClose={closeWalkthrough}
-        onNextStep={nextStep}
-        onPrevStep={prevStep}
-        onClearUnit={clearUnit}
-        onFinish={handleWalkthroughFinish}
-        triggerRef={walkthroughTriggerRef}
-      />
     </div>
   );
 }
