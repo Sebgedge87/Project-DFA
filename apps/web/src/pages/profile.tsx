@@ -118,7 +118,7 @@ export default function ProfilePage() {
     <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-6">
 
       {/* Profile card */}
-      <div className="bg-dfa-surface border border-dfa-border rounded-lg p-5">
+      <div className="bg-dfa-surface border border-dfa-border-neutral rounded-lg p-5">
         <div className="flex items-start gap-4">
           <Avatar src={avatarUrl} name={displayedName} size={14} />
 
@@ -133,7 +133,7 @@ export default function ProfilePage() {
                       value={displayName}
                       onChange={e => setDisplayName(e.target.value)}
                       placeholder="Your name"
-                      className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
+                      className="w-full bg-dfa-black border border-dfa-border-neutral rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
                     />
                   </div>
                   <div>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
                       value={username}
                       onChange={e => setUsername(e.target.value)}
                       placeholder="username"
-                      className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
+                      className="w-full bg-dfa-black border border-dfa-border-neutral rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
                     />
                   </div>
                 </div>
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                     onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself…"
                     rows={2}
-                    className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red resize-none"
+                    className="w-full bg-dfa-black border border-dfa-border-neutral rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red resize-none"
                   />
                 </div>
                 <div>
@@ -166,7 +166,7 @@ export default function ProfilePage() {
                     onChange={e => setDiscordId(e.target.value)}
                     placeholder="e.g. username or username#1234"
                     maxLength={100}
-                    className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
+                    className="w-full bg-dfa-black border border-dfa-border-neutral rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
                   />
                 </div>
 
@@ -189,7 +189,7 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={cancelEdit}
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                   >
                     <X size={12} />
                     Cancel
@@ -233,7 +233,7 @@ export default function ProfilePage() {
 
         {/* Password reset — only for email/password accounts */}
         {!editing && hasEmailProvider && (
-          <div className="mt-4 pt-4 border-t border-dfa-border">
+          <div className="mt-4 pt-4 border-t border-dfa-border-neutral">
             {resetSent ? (
               <p className="text-xs text-dfa-gold">Reset email sent — check your inbox.</p>
             ) : (
@@ -270,7 +270,7 @@ export default function ProfilePage() {
             Loading your armies…
           </div>
         ) : lists?.length === 0 ? (
-          <div className="text-center py-12 space-y-3 bg-dfa-surface border border-dfa-border rounded-lg">
+          <div className="text-center py-12 space-y-3 bg-dfa-surface border border-dfa-border-neutral rounded-lg">
             <p className="text-dfa-text-muted text-sm">No saved armies yet.</p>
             <button
               onClick={() => navigate('/')}
@@ -284,7 +284,7 @@ export default function ProfilePage() {
             {lists?.map((list) => (
               <div
                 key={list.id}
-                className="bg-dfa-surface border border-dfa-border rounded-lg p-4 flex items-center gap-4"
+                className="bg-dfa-surface border border-dfa-border-neutral rounded-lg p-4 flex items-center gap-4"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-dfa-text font-medium truncate">{list.name}</p>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
                   )}
                   <button
                     onClick={() => handleLoad(list.id)}
-                    className="px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                    className="px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                   >
                     Edit
                   </button>
@@ -338,7 +338,7 @@ export default function ProfilePage() {
             {templateLists.map((tmpl) => (
               <div
                 key={tmpl.id}
-                className="bg-dfa-surface border border-dfa-border rounded-lg p-4 flex items-center gap-4"
+                className="bg-dfa-surface border border-dfa-border-neutral rounded-lg p-4 flex items-center gap-4"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-dfa-text font-medium truncate">{tmpl.name}</p>
@@ -352,7 +352,7 @@ export default function ProfilePage() {
                     href={`/share/${tmpl.share_token}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                    className="px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                   >
                     View
                   </a>

@@ -66,7 +66,7 @@ export default function SharePage() {
 
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
             >
               <FileText size={15} />
               Export Roster
@@ -74,7 +74,7 @@ export default function SharePage() {
 
             <Link
               to="/rules"
-              className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
             >
               <BookOpen size={15} />
               View Rules
@@ -84,7 +84,7 @@ export default function SharePage() {
                 href={faction.store_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-sm rounded transition-colors"
               >
                 Buy Miniatures
               </a>
@@ -96,8 +96,8 @@ export default function SharePage() {
       {/* Unit list */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-8 space-y-6">
         {entries.map((entry: ArmyEntry) => (
-          <div key={entry.id} className="bg-dfa-surface border border-dfa-border rounded-lg overflow-hidden">
-            <div className="px-4 py-3 border-b border-dfa-border flex items-center justify-between">
+          <div key={entry.id} className="bg-dfa-surface border border-dfa-border-neutral rounded-lg overflow-hidden">
+            <div className="px-4 py-3 border-b border-dfa-border-neutral flex items-center justify-between">
               <div>
                 <span className="font-display text-dfa-text font-bold text-lg">{entry.unit_type.name}</span>
                 {entry.quantity > 1 && (

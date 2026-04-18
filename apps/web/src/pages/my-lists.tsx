@@ -101,7 +101,7 @@ export default function MyListsPage() {
       {isLoading ? (
         <div className="text-dfa-text-muted text-sm animate-pulse py-8 text-center">Loading your armies…</div>
       ) : !lists?.length ? (
-        <div className="text-center py-12 space-y-3 bg-dfa-surface border border-dfa-border rounded-lg">
+        <div className="text-center py-12 space-y-3 bg-dfa-surface border border-dfa-border-neutral rounded-lg">
           <p className="text-dfa-text-muted text-sm">No saved armies yet.</p>
           <button
             onClick={() => navigate('/')}
@@ -115,7 +115,7 @@ export default function MyListsPage() {
           {lists.map((list) => {
             const isPublic = localPublic[list.id] ?? list.is_public;
             return (
-              <div key={list.id} className="bg-dfa-surface border border-dfa-border rounded-lg p-4">
+              <div key={list.id} className="bg-dfa-surface border border-dfa-border-neutral rounded-lg p-4">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-dfa-text font-medium truncate">{list.name}</p>
@@ -141,7 +141,7 @@ export default function MyListsPage() {
                   <button
                     onClick={() => handleEdit(list.id)}
                     disabled={loadingEdit === list.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors disabled:opacity-50"
                   >
                     {loadingEdit === list.id && <Loader2 size={12} className="animate-spin" />}
                     Edit
@@ -152,7 +152,7 @@ export default function MyListsPage() {
                       href={`/share/${list.share_token}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                     >
                       <Eye size={12} />
                       View
@@ -167,14 +167,14 @@ export default function MyListsPage() {
                       setLocalPublic(s => ({ ...s, [list.id]: pub }));
                       await togglePublic.mutateAsync({ id: list.id, isPublic: pub });
                     }}
-                    triggerClassName="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
+                    triggerClassName="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                   />
 
                   <button
                     onClick={() => handleExport(list.id)}
                     disabled={exporting[list.id]}
                     aria-label={`Export ${list.name} roster`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors disabled:opacity-50"
                   >
                     {exporting[list.id] ? <Loader2 size={13} className="animate-spin" /> : <FileText size={13} />}
                     Export PDF
