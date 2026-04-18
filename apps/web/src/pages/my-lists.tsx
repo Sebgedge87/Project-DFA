@@ -5,6 +5,7 @@ import { useMyLists, useDeleteList, useToggleListPublic, supabase } from '@dfa/s
 import { useAuthStore } from '../stores/authStore';
 import { useArmyStore } from '../stores/armyStore';
 import { ShareModal } from '../components/ui/ShareModal';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { exportRosterPdf } from '../utils/exportRosterPdf';
 
 async function fetchAndExportPdf(listId: string) {
@@ -56,6 +57,7 @@ export default function MyListsPage() {
   const [localPublic, setLocalPublic] = useState<Record<string, boolean>>({});
   const [exporting, setExporting] = useState<Record<string, boolean>>({});
   const [loadingEdit, setLoadingEdit] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const handleEdit = async (id: string) => {
     setLoadingEdit(id);
@@ -70,11 +72,7 @@ export default function MyListsPage() {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Delete this army list? This cannot be undone.')) {
-      deleteList.mutate(id);
-    }
-  };
+  const handleDelete = (id: string) => setConfirmDeleteId(id);
 
   const handleExport = async (id: string) => {
     setExporting(s => ({ ...s, [id]: true }));
@@ -187,6 +185,17 @@ export default function MyListsPage() {
           })}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmDeleteId !== null}
+        title="Delete army?"
+        description="This army list will be permanently deleted. This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Keep it"
+        destructive
+        onConfirm={() => { if (confirmDeleteId) deleteList.mutate(confirmDeleteId); setConfirmDeleteId(null); }}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }
