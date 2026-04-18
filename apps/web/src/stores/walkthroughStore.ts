@@ -93,7 +93,6 @@ export const useWalkthroughStore = create<WalkthroughStore>((set, get) => ({
       walkthroughUnits: existing
         ? s.walkthroughUnits.map(wu => wu.unitType.id === unit.id ? { ...wu, quantity: wu.quantity + 1 } : wu)
         : [...s.walkthroughUnits, { unitType: unit, quantity: 1 }],
-      expandedUnitId: null,
     };
   }),
 
