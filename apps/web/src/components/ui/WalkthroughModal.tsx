@@ -133,9 +133,6 @@ function UnitCard({ unit, expanded, inArmy, qty, onToggle, onAdd, onAdjust, isCa
 
       {expanded && (
         <div className="px-3 pb-3 border-t border-dfa-border space-y-3 pt-3">
-          {unit.description && (
-            <p className="text-xs text-dfa-text-muted leading-relaxed italic">{unit.description}</p>
-          )}
           <StatBlock {...unit} />
           {(unit.abilities?.length ?? 0) > 0 && (
             <AbilityList abilities={(unit.abilities ?? []).slice(0, 4)} />
