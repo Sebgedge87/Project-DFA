@@ -1,14 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Swords, Library, Users, User, LogOut, BookOpen, Scroll } from 'lucide-react';
+import { Home, Library, Users, User, LogOut, BookOpen, Scroll } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
 const navItems = [
   { to: '/',          label: 'Home',      Icon: Home },
-  { to: '/builder',   label: 'Builder',   Icon: Swords },
   { to: '/lists',     label: 'My Lists',  Icon: Library },
   { to: '/community', label: 'Community', Icon: Users },
   { to: '/profile',   label: 'Profile',   Icon: User },
-  { to: '/rules',     label: 'Rules',     Icon: BookOpen },
 ];
 
 const navLinkClass = (isActive: boolean) =>
@@ -59,6 +57,18 @@ export function Sidebar({ className = '', onRosterOpen, rosterTriggerRef }: Side
           <Scroll size={17} />
           Roster
         </button>
+
+        {/* Separator */}
+        <div className="border-t border-dfa-border my-1" />
+
+        {/* Rules */}
+        <NavLink
+          to="/rules"
+          className={({ isActive }) => navLinkClass(isActive)}
+        >
+          <BookOpen size={17} />
+          Rules
+        </NavLink>
       </nav>
 
       {/* User / sign-out */}

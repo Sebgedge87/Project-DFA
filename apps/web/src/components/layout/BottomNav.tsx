@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Library, BookOpen, Users, User, Scroll } from 'lucide-react';
+import { Home, Library, BookOpen, Users, User } from 'lucide-react';
 
 const tabs = [
   { to: '/',          label: 'Home',      Icon: Home },
@@ -11,10 +11,9 @@ const tabs = [
 
 interface BottomNavProps {
   className?: string;
-  onRosterOpen: () => void;
 }
 
-export function BottomNav({ className = '', onRosterOpen }: BottomNavProps) {
+export function BottomNav({ className = '' }: BottomNavProps) {
   return (
     <nav aria-label="Main navigation" className={`bg-dfa-surface border-t border-dfa-border ${className}`}>
       <div className="flex">
@@ -33,15 +32,6 @@ export function BottomNav({ className = '', onRosterOpen }: BottomNavProps) {
             <span>{label}</span>
           </NavLink>
         ))}
-
-        {/* Roster — panel trigger */}
-        <button
-          onClick={onRosterOpen}
-          className="flex-1 flex flex-col items-center gap-1 py-2 text-xs text-dfa-text-muted hover:text-dfa-text transition-colors"
-        >
-          <Scroll size={20} />
-          <span>Roster</span>
-        </button>
       </div>
     </nav>
   );

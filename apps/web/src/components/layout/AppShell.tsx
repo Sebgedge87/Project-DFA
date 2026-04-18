@@ -21,7 +21,6 @@ export function AppShell() {
       </main>
       <BottomNav
         className="fixed bottom-0 inset-x-0 md:hidden z-50"
-        onRosterOpen={() => setRosterOpen(true)}
       />
       <RosterPanel
         open={rosterOpen}
