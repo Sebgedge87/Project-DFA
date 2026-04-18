@@ -1,8 +1,8 @@
 interface ExportWeapon {
   name: string;
-  range_inches?: number | null;
+  range_inches?: string | null;
   num_attacks: number;
-  damage: number;
+  damage: string | number;
   defence_mod?: number;
   weapon_keywords?: Array<{ keyword: { name: string }; parameter?: string | null }>;
 }
@@ -73,7 +73,7 @@ export function exportRosterPdf(data: RosterExportData) {
       return `
         <tr>
           <td>${esc(w.name)}</td>
-          <td class="center">${w.range_inches != null ? `${w.range_inches}"` : 'Melee'}</td>
+          <td class="center">${w.range_inches ?? 'Melee'}</td>
           <td class="center mono">${w.num_attacks}</td>
           <td class="center mono">${w.damage}</td>
           <td class="center mono">${ap}</td>
