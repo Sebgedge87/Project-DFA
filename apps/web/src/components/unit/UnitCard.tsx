@@ -29,7 +29,7 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect }: UnitCardProps)
 
   return (
     <motion.div
-      className="bg-dfa-surface border border-dfa-border rounded-lg overflow-hidden"
+      className={`bg-dfa-surface border rounded-lg overflow-hidden ${quantity > 0 ? 'border-dfa-border border-l-2 border-l-dfa-red' : 'border-dfa-border'}`}
       whileHover={{ borderColor: '#8B1A1A' }}
       layout
     >
@@ -60,6 +60,11 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect }: UnitCardProps)
             {unit.points}pts
           </span>
           <RoleBadge role={unit.role} />
+          {quantity > 0 && (
+            <span className="absolute bottom-2 left-2 text-[10px] font-bold bg-dfa-red text-white px-1.5 py-0.5 rounded font-mono">
+              ×{quantity}
+            </span>
+          )}
         </div>
 
         {/* Name + stat block */}

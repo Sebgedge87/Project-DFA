@@ -458,11 +458,7 @@ export function WalkthroughModal() {
     const army = useArmyStore.getState();
     army.setFaction(selectedFaction);
     army.setName(armyName);
-    for (const wu of walkthroughUnits) {
-      for (let i = 0; i < wu.quantity; i++) {
-        army.addUnit(wu.unitType);
-      }
-    }
+    useWalkthroughStore.getState().commitToArmy(walkthroughUnits);
     try { await army.saveList(false); } catch { /* proceed anyway */ }
     try {
       await updateProfile.mutateAsync({ userId: user.id, updates: { has_completed_walkthrough: true } });

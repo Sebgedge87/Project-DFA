@@ -38,7 +38,7 @@ export const useArmyStore = create<ArmyState>()(
       _setHasHydrated: (v) => set({ _hasHydrated: v }),
 
       setFaction: (faction) => {
-        localStorage.removeItem('dfa-walkthrough-dismissed');
+        localStorage.removeItem('dfa-guidedsteps-dismissed');
         set({ faction, entries: [], isDirty: false, listId: null, shareToken: null });
       },
 

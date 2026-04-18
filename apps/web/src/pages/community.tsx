@@ -103,7 +103,7 @@ export default function CommunityPage() {
           placeholder="Search armies…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full bg-dfa-surface border border-dfa-border rounded pl-8 pr-8 py-2 text-sm text-dfa-text placeholder-dfa-text-muted focus:outline-none focus:border-dfa-red"
+          className="w-full bg-dfa-surface border border-dfa-border-neutral rounded pl-8 pr-8 py-2 text-sm text-dfa-text placeholder-dfa-text-muted focus:outline-none focus:border-dfa-red"
         />
         {search && (
           <button onClick={() => setSearch('')} aria-label="Clear search"
@@ -207,7 +207,7 @@ function ListCard({ list }: { list: PublicList }) {
   const ago = formatAgo(list.updated_at);
 
   return (
-    <div className="bg-dfa-surface border border-dfa-border rounded-lg overflow-hidden flex flex-col hover:border-dfa-border/80 transition-colors">
+    <div className="bg-dfa-surface border border-dfa-border-neutral rounded-lg overflow-hidden flex flex-col hover:border-dfa-text-muted/40 transition-colors">
       {/* Faction colour bar */}
       <div className="h-1" style={{ background: `#${color}` }} />
 
@@ -238,7 +238,7 @@ function ListCard({ list }: { list: PublicList }) {
 
         <Link
           to={`/share/${list.share_token}`}
-          className="mt-auto block w-full text-center py-1.5 border border-dfa-border text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted text-xs rounded transition-colors"
+          className="mt-auto block w-full text-center py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted text-xs rounded transition-colors"
         >
           View Army
         </Link>

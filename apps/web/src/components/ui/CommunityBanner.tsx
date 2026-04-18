@@ -40,7 +40,7 @@ export function CommunityBanner() {
                 aria-hidden={isDupe ? 'true' : undefined}
                 tabIndex={-1}
                 onClick={() => !isDupe && navigate(`/share/${list.share_token}`)}
-                className="shrink-0 w-44 bg-dfa-surface border border-dfa-border rounded-lg overflow-hidden cursor-pointer hover:border-dfa-red/60 transition-colors"
+                className="shrink-0 w-44 bg-dfa-surface border border-dfa-border-neutral rounded-lg overflow-hidden cursor-pointer hover:border-dfa-red/60 transition-colors"
               >
                 {/* Cover image / colour swatch */}
                 <div

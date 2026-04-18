@@ -13,6 +13,7 @@ export default {
         'dfa-text':           '#F0EDE8',
         'dfa-text-muted':     '#9A8A80',
         'dfa-gold':           '#C4943A',
+        'dfa-border-neutral': '#2A2A2A',
       },
       fontFamily: {
         display: ['Barlow Condensed', 'sans-serif'],

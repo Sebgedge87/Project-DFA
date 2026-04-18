@@ -151,6 +151,27 @@ export default function BuilderPage() {
           </div>
         )}
 
+        {/* Mobile army summary bar */}
+        {(() => {
+          const totalModels = entries.reduce((s, e) => s + e.quantity, 0);
+          const pct = points / 1000;
+          const over = points > 1000;
+          const ptColour = over || pct >= 0.95 ? 'text-red-400' : pct >= 0.8 ? 'text-amber-400' : 'text-dfa-gold';
+          return (
+            <div className="md:hidden sticky top-0 z-30 bg-dfa-surface border-b border-dfa-border px-4 py-2 flex items-center gap-3 shrink-0">
+              <span className={`font-mono font-bold text-sm ${ptColour}`}>{points}<span className="text-dfa-text-muted font-normal text-xs"> / 1000pts</span></span>
+              <span className="text-dfa-text-muted text-xs">{totalModels} model{totalModels !== 1 ? 's' : ''}</span>
+              <a
+                href="#army-sidebar"
+                onClick={e => { e.preventDefault(); document.getElementById('army-sidebar')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="ml-auto px-3 py-1 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors"
+              >
+                View Army
+              </a>
+            </div>
+          );
+        })()}
+
         {/* Tabs */}
         <div className="flex gap-0 px-4 md:px-6 pt-3 border-b border-dfa-border shrink-0">
           {(['units', 'faction'] as const).map(tab => (
@@ -319,13 +340,15 @@ export default function BuilderPage() {
       </div>
 
       {/* ── Army sidebar ────────────────────────────────────────────────── */}
-      <aside className="lg:w-80 xl:w-96 flex flex-col bg-dfa-surface border-t lg:border-t-0 lg:border-l border-dfa-border lg:sticky lg:top-0 lg:h-screen">
+      <aside id="army-sidebar" className="lg:w-80 xl:w-96 flex flex-col bg-dfa-surface border-t lg:border-t-0 lg:border-l border-dfa-border lg:sticky lg:top-0 lg:h-screen">
         {/* Fixed header */}
         <div className="shrink-0 bg-dfa-surface p-4 border-b border-dfa-border space-y-3">
           <input
             type="text"
             value={listName}
             onChange={(e) => setName(e.target.value)}
+            aria-label="Army name"
+            placeholder="Army name…"
             className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
           />
           <PointsBar current={points} />

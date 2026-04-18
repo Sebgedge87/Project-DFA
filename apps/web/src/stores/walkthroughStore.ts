@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Faction, UnitType } from '@dfa/types';
+import { useArmyStore } from './armyStore';
 
 export interface WalkthroughUnit {
   unitType: UnitType;
@@ -32,6 +33,7 @@ interface WalkthroughStore {
   adjustQuantity: (unitId: string, delta: 1 | -1) => void;
   skipStep3: () => void;
   setArmyName: (name: string) => void;
+  commitToArmy: (units: WalkthroughUnit[]) => void;
 }
 
 export const useWalkthroughStore = create<WalkthroughStore>((set, get) => ({
@@ -110,4 +112,15 @@ export const useWalkthroughStore = create<WalkthroughStore>((set, get) => ({
   skipStep3: () => set({ step3Skipped: true }),
 
   setArmyName: (name) => set({ armyName: name }),
+
+  commitToArmy: (units) => {
+    const army = useArmyStore.getState();
+    for (const wu of units) {
+      army.addUnit(wu.unitType);
+      if (wu.quantity > 1) {
+        const entry = useArmyStore.getState().entries.find(e => e.unit_type.id === wu.unitType.id);
+        if (entry) army.setQuantity(entry.id, wu.quantity);
+      }
+    }
+  },
 }));
