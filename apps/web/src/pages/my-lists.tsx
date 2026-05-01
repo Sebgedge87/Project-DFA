@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, FileText, Loader2, Eye } from 'lucide-react';
-import { useMyLists, useDeleteList, useToggleListPublic, supabase } from '@dfa/supabase-client';
+import { Plus, Trash2, FileText, Loader2, Eye, Copy } from 'lucide-react';
+import { useMyLists, useDeleteList, useToggleListPublic, useDuplicateList, supabase } from '@dfa/supabase-client';
 import { useAuthStore } from '../stores/authStore';
 import { useArmyStore } from '../stores/armyStore';
 import { ShareModal } from '../components/ui/ShareModal';
@@ -49,8 +49,9 @@ async function fetchAndExportPdf(listId: string) {
 export default function MyListsPage() {
   const { user } = useAuthStore();
   const { data: lists, isLoading } = useMyLists(user?.id ?? null);
-  const deleteList = useDeleteList();
-  const togglePublic = useToggleListPublic();
+  const deleteList    = useDeleteList();
+  const togglePublic  = useToggleListPublic();
+  const duplicateList = useDuplicateList();
   const { loadList } = useArmyStore();
   const navigate = useNavigate();
 
@@ -58,6 +59,7 @@ export default function MyListsPage() {
   const [exporting, setExporting] = useState<Record<string, boolean>>({});
   const [loadingEdit, setLoadingEdit] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [duplicating, setDuplicating] = useState<string | null>(null);
 
   const handleEdit = async (id: string) => {
     setLoadingEdit(id);
@@ -73,6 +75,16 @@ export default function MyListsPage() {
   };
 
   const handleDelete = (id: string) => setConfirmDeleteId(id);
+
+  const handleDuplicate = async (id: string) => {
+    if (!user) return;
+    setDuplicating(id);
+    try {
+      await duplicateList.mutateAsync({ listId: id, userId: user.id });
+    } finally {
+      setDuplicating(null);
+    }
+  };
 
   const handleExport = async (id: string) => {
     setExporting(s => ({ ...s, [id]: true }));
@@ -169,6 +181,16 @@ export default function MyListsPage() {
                     }}
                     triggerClassName="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors"
                   />
+
+                  <button
+                    onClick={() => handleDuplicate(list.id)}
+                    disabled={duplicating === list.id}
+                    aria-label={`Duplicate ${list.name}`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-dfa-border-neutral text-dfa-text-muted hover:text-dfa-text text-xs rounded transition-colors disabled:opacity-50"
+                  >
+                    {duplicating === list.id ? <Loader2 size={13} className="animate-spin" /> : <Copy size={13} />}
+                    Duplicate
+                  </button>
 
                   <button
                     onClick={() => handleExport(list.id)}
