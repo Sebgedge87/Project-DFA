@@ -2,12 +2,12 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb, Scroll, HelpCircle } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
-import { calculatePoints, validateArmy } from '@dfa/logic';
+import { calculatePoints } from '@dfa/logic';
 import type { UnitRole } from '@dfa/types';
 
 import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
-import { ValidationAlert } from '../../components/ui/ValidationAlert';
+import { ValidationChecklist } from '../../components/builder/ValidationChecklist';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
 import { RosterPanel } from '../../components/ui/RosterPanel';
@@ -72,7 +72,6 @@ export default function BuilderPage() {
   }, [units]);
 
   const points = calculatePoints(entries);
-  const validationErrors = validateArmy(entries).map((r) => r.error!).filter(Boolean);
 
   const handleSave = async () => {
     if (!user) { navigate(`/auth?returnTo=${encodeURIComponent(`/builder/${factionSlug}`)}`); return; }
@@ -103,7 +102,10 @@ export default function BuilderPage() {
       <div className="flex-1 flex flex-col min-h-0 lg:overflow-hidden">
 
         {/* Header */}
-        <div className="p-4 md:px-6 md:pt-6 md:pb-0 flex items-center justify-between gap-3 shrink-0">
+        <div
+          className="p-4 md:px-6 md:pt-6 md:pb-0 flex items-center justify-between gap-3 shrink-0"
+          style={faction?.color_primary ? { background: `linear-gradient(135deg, #${faction.color_primary}18 0%, transparent 60%)` } : undefined}
+        >
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/')} className="text-dfa-text-muted hover:text-dfa-text transition-colors">
               <ArrowLeft size={20} />
@@ -245,6 +247,7 @@ export default function BuilderPage() {
                         unit={unit}
                         onAdd={addUnit}
                         quantity={entry?.quantity ?? 0}
+                        currentPoints={points}
                       />
                     );
                   })}
@@ -351,8 +354,8 @@ export default function BuilderPage() {
             placeholder="Army name…"
             className="w-full bg-dfa-black border border-dfa-border rounded px-3 py-1.5 text-sm text-dfa-text focus:outline-none focus:border-dfa-red"
           />
-          <PointsBar current={points} />
-          {validationErrors.length > 0 && <ValidationAlert errors={validationErrors} />}
+          <PointsBar current={points} factionColor={faction?.color_primary} />
+          <ValidationChecklist entries={entries} points={points} />
         </div>
 
         {/* Scrollable entries */}

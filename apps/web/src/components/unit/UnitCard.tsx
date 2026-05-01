@@ -8,21 +8,32 @@ import { WeaponTable } from './WeaponTable';
 import { RoleBadge } from './RoleBadge';
 
 interface UnitCardProps {
-  unit:       UnitType;
-  onAdd:      (unit: UnitType) => ValidationResult;
-  quantity?:  number;
-  onSelect?:  (unit: UnitType) => void;
+  unit:          UnitType;
+  onAdd:         (unit: UnitType) => ValidationResult;
+  quantity?:     number;
+  onSelect?:     (unit: UnitType) => void;
+  currentPoints?: number;
 }
 
-export function UnitCard({ unit, onAdd, quantity = 0, onSelect }: UnitCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints }: UnitCardProps) {
+  const [expanded, setExpanded]     = useState(false);
+  const [error, setError]           = useState<string | null>(null);
+  const [showBudget, setShowBudget] = useState(false);
 
   const handleAdd = () => {
     const result = onAdd(unit);
     if (!result.ok) setError(result.error ?? null);
     else setError(null);
   };
+
+  const remaining = currentPoints !== undefined ? 1000 - (currentPoints + unit.points) : null;
+  const budgetStatus = remaining === null ? null : remaining < 0 ? 'over' : remaining < 100 ? 'caution' : 'safe';
+  const budgetColour = budgetStatus === 'over' ? 'text-red-400' : budgetStatus === 'caution' ? 'text-amber-400' : 'text-green-400';
+  const budgetLabel  = remaining === null
+    ? null
+    : remaining < 0
+    ? `${Math.abs(remaining)}pts over budget`
+    : `${remaining}pts remaining after adding`;
 
   // Top section is a button when the walkthrough guide wants unit detail clicks
   const TopTag = onSelect ? 'button' : 'div';
@@ -128,10 +139,17 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect }: UnitCardProps)
         <p className="px-3 pb-1 text-xs text-red-400">{error}</p>
       )}
 
-      {/* Add button */}
-      <div className="p-3 pt-0">
+      {/* Add button with budget preview */}
+      <div className="p-3 pt-0 relative">
+        {showBudget && budgetLabel && (
+          <div className="absolute bottom-full left-3 right-3 mb-1 px-2 py-1.5 bg-dfa-black border border-dfa-border rounded text-xs text-center pointer-events-none z-10">
+            <span className={budgetColour}>{budgetLabel}</span>
+          </div>
+        )}
         <button
           onClick={handleAdd}
+          onMouseEnter={() => setShowBudget(true)}
+          onMouseLeave={() => setShowBudget(false)}
           className="w-full py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded transition-colors"
         >
           {quantity > 0 ? `Add Another (×${quantity})` : 'Add to Army'}
