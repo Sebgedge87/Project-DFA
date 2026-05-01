@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Save, ArrowLeft, Trash2, Plus, Minus, Search, X, BookOpen, ShoppingBag, Lightbulb, Scroll, HelpCircle, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 import { useUnitTypes, useFactions } from '@dfa/supabase-client';
@@ -8,10 +8,12 @@ import type { UnitRole, UnitType } from '@dfa/types';
 import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationChecklist } from '../../components/builder/ValidationChecklist';
+import { ArmyStats } from '../../components/builder/ArmyStats';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
 import { RosterPanel } from '../../components/ui/RosterPanel';
 import { useWalkthrough } from '../../hooks/useWalkthrough';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useWalkthroughStore } from '../../stores/walkthroughStore';
 import { useArmyStore } from '../../stores/armyStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -34,7 +36,7 @@ export default function BuilderPage() {
 
   const { data: units, isLoading } = useUnitTypes(faction?.id ?? null);
 
-  const { entries, listName, listId, isDirty, isSaving, shareToken, addUnit, removeUnit, setQuantity, setName, saveList, setFaction, _hasHydrated } =
+  const { entries, listName, listId, isDirty, isSaving, shareToken, lastAddedUnitId, addUnit, removeUnit, setQuantity, setName, saveList, setFaction, _hasHydrated } =
     useArmyStore();
   const [isPublic, setIsPublic] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -50,6 +52,7 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<'units' | 'faction'>('units');
   const [rosterOpen, setRosterOpen] = useState(false);
   const rosterTriggerRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef   = useRef<HTMLInputElement>(null);
 
   const { dismissed, dismiss, enable } = useWalkthrough(user?.id ?? null);
   const openWalkthrough = useWalkthroughStore(s => s.open);
@@ -91,6 +94,19 @@ export default function BuilderPage() {
   }, [units]);
 
   const points = calculatePoints(entries);
+
+  const handleSaveCallback = useCallback(() => {
+    if (!user) { navigate(`/auth?returnTo=${encodeURIComponent(`/builder/${factionSlug}`)}`); return; }
+    setSaveError(null);
+    saveList(isPublic).then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }).catch((e: any) => setSaveError(e.message ?? 'Save failed'));
+  }, [user, navigate, factionSlug, saveList, isPublic]);
+
+  useKeyboardShortcuts({
+    searchRef:     searchInputRef,
+    onSave:        handleSaveCallback,
+    onRoleFilter:  (r) => setRoleFilter(r as RoleFilter),
+    onClearSearch: () => setSearch(''),
+  });
 
   const handleQuickAdd = (unit: UnitType) => {
     const result = addUnit(unit);
@@ -230,8 +246,9 @@ export default function BuilderPage() {
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-dfa-text-muted pointer-events-none" aria-hidden="true" />
                     <input
                       id="unit-search"
+                      ref={searchInputRef}
                       type="text"
-                      placeholder="Search units…"
+                      placeholder="Search units… ( / )"
                       value={search}
                       onChange={e => setSearch(e.target.value)}
                       className="w-full bg-dfa-surface border border-dfa-border rounded pl-8 pr-8 py-1.5 text-sm text-dfa-text placeholder-dfa-text-muted focus:outline-none focus:border-dfa-red"
@@ -340,6 +357,7 @@ export default function BuilderPage() {
                         onAdd={addUnit}
                         quantity={entry?.quantity ?? 0}
                         currentPoints={points}
+                        recentlyAdded={lastAddedUnitId === unit.id}
                       />
                     );
                   })}
@@ -463,6 +481,7 @@ export default function BuilderPage() {
           />
           <PointsBar current={points} factionColor={faction?.color_primary} />
           <ValidationChecklist entries={entries} points={points} />
+          <ArmyStats entries={entries} points={points} />
         </div>
 
         {/* Scrollable entries */}
@@ -490,7 +509,7 @@ export default function BuilderPage() {
             </div>
           ) : (
             entries.map((entry) => (
-              <div key={entry.id} className="flex items-center gap-3 p-3">
+              <div key={entry.id} className={`flex items-center gap-3 p-3 transition-colors ${lastAddedUnitId === entry.unit_type.id ? 'bg-green-900/20' : ''}`}>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-dfa-text font-medium truncate">{entry.unit_type.name}</p>
                   <p className="text-xs text-dfa-gold font-mono">

@@ -2,24 +2,30 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import type { UnitType, UnitRole, ValidationResult } from '@dfa/types';
-
-const ROLE_FALLBACK: Record<UnitRole, string> = {
-  captain: '👑', specialist: '⚡', core: '🛡️',
-};
 import { StatBlock } from './StatBlock';
 import { AbilityList } from './AbilityList';
 import { WeaponTable } from './WeaponTable';
 import { RoleBadge } from './RoleBadge';
 
+const ROLE_FALLBACK: Record<UnitRole, string> = {
+  captain: '👑', specialist: '⚡', core: '🛡️',
+};
+
 interface UnitCardProps {
-  unit:          UnitType;
-  onAdd:         (unit: UnitType) => ValidationResult;
-  quantity?:     number;
-  onSelect?:     (unit: UnitType) => void;
+  unit:           UnitType;
+  onAdd:          (unit: UnitType) => ValidationResult;
+  quantity?:      number;
+  onSelect?:      (unit: UnitType) => void;
   currentPoints?: number;
+  recentlyAdded?: boolean;
 }
 
-export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints }: UnitCardProps) {
+const cardVariants = {
+  hidden:  { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+};
+
+export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints, recentlyAdded }: UnitCardProps) {
   const [expanded, setExpanded]     = useState(false);
   const [error, setError]           = useState<string | null>(null);
   const [showBudget, setShowBudget] = useState(false);
@@ -39,13 +45,22 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints }:
     ? `${Math.abs(remaining)}pts over budget`
     : `${remaining}pts remaining after adding`;
 
+  const borderClass = recentlyAdded
+    ? 'border-green-700 border-l-2 border-l-green-500'
+    : quantity > 0
+    ? 'border-dfa-border border-l-2 border-l-dfa-red'
+    : 'border-dfa-border';
+
   // Top section is a button when the walkthrough guide wants unit detail clicks
   const TopTag = onSelect ? 'button' : 'div';
 
   return (
     <motion.div
-      className={`bg-dfa-surface border rounded-lg overflow-hidden ${quantity > 0 ? 'border-dfa-border border-l-2 border-l-dfa-red' : 'border-dfa-border'}`}
-      whileHover={{ borderColor: '#8B1A1A' }}
+      className={`bg-dfa-surface border rounded-lg overflow-hidden ${borderClass}`}
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{ borderColor: recentlyAdded ? '#15803d' : '#8B1A1A' }}
       layout
     >
       {/* Clickable top section (image + stats) — activates when walkthrough is open */}
@@ -140,7 +155,13 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints }:
 
       {/* Validation error */}
       {error && (
-        <p className="px-3 pb-1 text-xs text-red-400">{error}</p>
+        <motion.p
+          animate={{ x: [0, -4, 4, -4, 4, 0] }}
+          transition={{ duration: 0.3 }}
+          className="px-3 pb-1 text-xs text-red-400"
+        >
+          {error}
+        </motion.p>
       )}
 
       {/* Add button with budget preview */}

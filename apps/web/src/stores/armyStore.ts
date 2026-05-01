@@ -12,6 +12,7 @@ interface ArmyState {
   shareToken: string | null;
   isDirty: boolean;
   isSaving: boolean;
+  lastAddedUnitId: string | null;
   _hasHydrated: boolean;
   _setHasHydrated: (v: boolean) => void;
   setFaction: (faction: Faction) => void;
@@ -34,6 +35,7 @@ export const useArmyStore = create<ArmyState>()(
       shareToken: null,
       isDirty: false,
       isSaving: false,
+      lastAddedUnitId: null,
       _hasHydrated: false,
       _setHasHydrated: (v) => set({ _hasHydrated: v }),
 
@@ -53,13 +55,16 @@ export const useArmyStore = create<ArmyState>()(
                   e.unit_type.id === unit.id ? { ...e, quantity: e.quantity + 1 } : e,
                 ),
                 isDirty: true,
+                lastAddedUnitId: unit.id,
               };
             }
             return {
               entries: [...s.entries, { id: crypto.randomUUID(), unit_type: unit, quantity: 1 }],
               isDirty: true,
+              lastAddedUnitId: unit.id,
             };
           });
+          setTimeout(() => set({ lastAddedUnitId: null }), 2000);
         }
         return result;
       },

@@ -121,6 +121,41 @@ export function useTemplateLists() {
   });
 }
 
+export function useDuplicateList() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ listId, userId }: { listId: string; userId: string }) => {
+      const { data: original, error: fetchErr } = await supabase
+        .from('army_lists')
+        .select('*, army_entries(unit_type_id, quantity)')
+        .eq('id', listId)
+        .single();
+      if (fetchErr) throw fetchErr;
+      const o = original as any;
+
+      const { data: copy, error: insertErr } = await supabase
+        .from('army_lists')
+        .insert({ name: `${o.name} (Copy)`, faction_id: o.faction_id, points_total: o.points_total, is_public: false, user_id: userId } as any)
+        .select()
+        .single();
+      if (insertErr) throw insertErr;
+      const c = copy as any;
+
+      if (o.army_entries?.length) {
+        const { error: entriesErr } = await supabase.from('army_entries').insert(
+          o.army_entries.map((e: any) => ({ army_list_id: c.id, unit_type_id: e.unit_type_id, quantity: e.quantity })),
+        );
+        if (entriesErr) throw entriesErr;
+      }
+
+      return c.id as string;
+    },
+    onSuccess: (_id, { userId }) => {
+      qc.invalidateQueries({ queryKey: ['army_lists', userId] });
+    },
+  });
+}
+
 export function useCloneList() {
   const qc = useQueryClient();
   return useMutation({
