@@ -12,12 +12,15 @@ const ROLE_FALLBACK: Record<UnitRole, string> = {
 };
 
 interface UnitCardProps {
-  unit:           UnitType;
-  onAdd:          (unit: UnitType) => ValidationResult;
-  quantity?:      number;
-  onSelect?:      (unit: UnitType) => void;
-  currentPoints?: number;
-  recentlyAdded?: boolean;
+  unit:            UnitType;
+  onAdd:           (unit: UnitType) => ValidationResult;
+  quantity?:       number;
+  onSelect?:       (unit: UnitType) => void;
+  currentPoints?:  number;
+  recentlyAdded?:  boolean;
+  compareMode?:    boolean;
+  isComparing?:    boolean;
+  onCompare?:      (unit: UnitType) => void;
 }
 
 const cardVariants = {
@@ -25,7 +28,7 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
 };
 
-export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints, recentlyAdded }: UnitCardProps) {
+export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints, recentlyAdded, compareMode, isComparing, onCompare }: UnitCardProps) {
   const [expanded, setExpanded]     = useState(false);
   const [error, setError]           = useState<string | null>(null);
   const [showBudget, setShowBudget] = useState(false);
@@ -164,21 +167,36 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints, r
         </motion.p>
       )}
 
-      {/* Add button with budget preview */}
+      {/* Add / Compare button */}
       <div className="p-3 pt-0 relative">
-        {showBudget && budgetLabel && (
-          <div className="absolute bottom-full left-3 right-3 mb-1 px-2 py-1.5 bg-dfa-black border border-dfa-border rounded text-xs text-center pointer-events-none z-10">
-            <span className={budgetColour}>{budgetLabel}</span>
-          </div>
+        {compareMode ? (
+          <button
+            onClick={() => onCompare?.(unit)}
+            className={`w-full py-2 text-sm font-bold rounded border transition-colors ${
+              isComparing
+                ? 'bg-dfa-gold/20 border-dfa-gold text-dfa-gold'
+                : 'bg-dfa-surface-raised border-dfa-border text-dfa-text-muted hover:text-dfa-text hover:border-dfa-text-muted'
+            }`}
+          >
+            {isComparing ? '✓ Comparing' : 'Add to Compare'}
+          </button>
+        ) : (
+          <>
+            {showBudget && budgetLabel && (
+              <div className="absolute bottom-full left-3 right-3 mb-1 px-2 py-1.5 bg-dfa-black border border-dfa-border rounded text-xs text-center pointer-events-none z-10">
+                <span className={budgetColour}>{budgetLabel}</span>
+              </div>
+            )}
+            <button
+              onClick={handleAdd}
+              onMouseEnter={() => setShowBudget(true)}
+              onMouseLeave={() => setShowBudget(false)}
+              className="w-full py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded transition-colors"
+            >
+              {quantity > 0 ? `Add Another (×${quantity})` : 'Add to Army'}
+            </button>
+          </>
         )}
-        <button
-          onClick={handleAdd}
-          onMouseEnter={() => setShowBudget(true)}
-          onMouseLeave={() => setShowBudget(false)}
-          className="w-full py-2 bg-dfa-red hover:bg-dfa-red-bright text-white text-sm font-bold rounded transition-colors"
-        >
-          {quantity > 0 ? `Add Another (×${quantity})` : 'Add to Army'}
-        </button>
       </div>
     </motion.div>
   );

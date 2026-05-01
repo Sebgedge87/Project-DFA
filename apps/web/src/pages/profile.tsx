@@ -5,6 +5,7 @@ import { useMyLists, useDeleteList, useProfile, useUpdateProfile, useTemplateLis
 import { useAuthStore } from '../stores/authStore';
 import { useArmyStore } from '../stores/armyStore';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { ThemeSwitcher } from '../components/settings/ThemeSwitcher';
 
 function Avatar({ src, name, size = 16 }: { src?: string | null; name?: string | null; size?: number }) {
   if (src) {
@@ -376,6 +377,16 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Appearance */}
+      <div>
+        <h2 className="font-display text-dfa-text text-lg font-bold uppercase tracking-wide mb-4">
+          Appearance
+        </h2>
+        <div className="bg-dfa-surface border border-dfa-border-neutral rounded-lg p-5">
+          <ThemeSwitcher />
+        </div>
+      </div>
 
       <ConfirmDialog
         open={confirmDeleteId !== null}

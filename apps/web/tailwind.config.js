@@ -4,16 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        'dfa-red':            '#8B1A1A',
-        'dfa-red-bright':     '#C41E1E',
-        'dfa-black':          '#0D0D0D',
-        'dfa-surface':        '#1A1A1A',
-        'dfa-surface-raised': '#222222',
-        'dfa-border':         '#3A1A1A',
-        'dfa-text':           '#F0EDE8',
-        'dfa-text-muted':     '#9A8A80',
-        'dfa-gold':           '#C4943A',
-        'dfa-border-neutral': '#2A2A2A',
+        // These two use CSS vars so theme switching works, including opacity variants (bg-dfa-red/10 etc.)
+        'dfa-red':            'rgb(var(--dfa-red-rgb) / <alpha-value>)',
+        'dfa-red-bright':     'rgb(var(--dfa-red-bright-rgb) / <alpha-value>)',
+        // Remaining colors reference CSS vars for inline-style theming
+        'dfa-black':          'var(--dfa-black)',
+        'dfa-surface':        'var(--dfa-surface)',
+        'dfa-surface-raised': 'var(--dfa-surface-raised)',
+        'dfa-border':         'var(--dfa-border)',
+        'dfa-text':           'var(--dfa-text)',
+        'dfa-text-muted':     'var(--dfa-text-muted)',
+        'dfa-gold':           'var(--dfa-gold)',
+        'dfa-border-neutral': 'var(--dfa-border-neutral)',
       },
       fontFamily: {
         display: ['Barlow Condensed', 'sans-serif'],

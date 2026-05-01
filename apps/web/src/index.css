@@ -2,18 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DFA CSS custom properties — available outside Tailwind (e.g. inline styles) */
-:root {
-  --dfa-red:            #8B1A1A;
-  --dfa-red-bright:     #C41E1E;
-  --dfa-black:          #0D0D0D;
-  --dfa-surface:        #1A1A1A;
-  --dfa-surface-raised: #222222;
-  --dfa-border:         #3A1A1A;
-  --dfa-text:           #F0EDE8;
-  --dfa-text-muted:     #9A8A80;
-  --dfa-gold:           #C4943A;
-  --dfa-border-neutral: #2A2A2A;
+/* ── Theme: Arena (default) ─────────────────────────────────────────── */
+:root,
+[data-theme="arena"] {
+  --dfa-red:              #8B1A1A;
+  --dfa-red-rgb:          139 26 26;
+  --dfa-red-bright:       #C41E1E;
+  --dfa-red-bright-rgb:   196 30 30;
+  --dfa-black:            #0D0D0D;
+  --dfa-surface:          #1A1A1A;
+  --dfa-surface-raised:   #222222;
+  --dfa-border:           #3A1A1A;
+  --dfa-text:             #F0EDE8;
+  --dfa-text-muted:       #9A8A80;
+  --dfa-gold:             #C4943A;
+  --dfa-border-neutral:   #2A2A2A;
+}
+
+/* ── Theme: Battlefield ─────────────────────────────────────────────── */
+[data-theme="battlefield"] {
+  --dfa-red:              #1A5A1A;
+  --dfa-red-rgb:          26 90 26;
+  --dfa-red-bright:       #247824;
+  --dfa-red-bright-rgb:   36 120 36;
+  --dfa-black:            #0A0F0A;
+  --dfa-surface:          #141F14;
+  --dfa-surface-raised:   #1C2B1C;
+  --dfa-border:           #1A3A1A;
+  --dfa-text:             #E8F0E8;
+  --dfa-text-muted:       #7A9A7A;
+  --dfa-gold:             #8AB48A;
+  --dfa-border-neutral:   #1F2F1F;
+}
+
+/* ── Theme: Classic ─────────────────────────────────────────────────── */
+[data-theme="classic"] {
+  --dfa-red:              #7A0000;
+  --dfa-red-rgb:          122 0 0;
+  --dfa-red-bright:       #B20000;
+  --dfa-red-bright-rgb:   178 0 0;
+  --dfa-black:            #111111;
+  --dfa-surface:          #1C1C1C;
+  --dfa-surface-raised:   #252525;
+  --dfa-border:           #383838;
+  --dfa-text:             #FFFFFF;
+  --dfa-text-muted:       #AAAAAA;
+  --dfa-gold:             #D4A020;
+  --dfa-border-neutral:   #333333;
 }
 
 html {
@@ -22,6 +57,7 @@ html {
 
 body {
   @apply bg-dfa-black text-dfa-text font-body;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 @keyframes marquee {

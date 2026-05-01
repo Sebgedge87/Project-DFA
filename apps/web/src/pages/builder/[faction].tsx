@@ -9,6 +9,9 @@ import { UnitCard } from '../../components/unit/UnitCard';
 import { PointsBar } from '../../components/builder/PointsBar';
 import { ValidationChecklist } from '../../components/builder/ValidationChecklist';
 import { ArmyStats } from '../../components/builder/ArmyStats';
+import { ComparePanel } from '../../components/builder/ComparePanel';
+import { UnitSuggestions } from '../../components/builder/UnitSuggestions';
+import { BottomSheet } from '../../components/mobile/BottomSheet';
 import { ShareModal } from '../../components/ui/ShareModal';
 import { GuidedSteps } from '../../components/ui/GuidedSteps';
 import { RosterPanel } from '../../components/ui/RosterPanel';
@@ -51,6 +54,9 @@ export default function BuilderPage() {
   const [rosterFeedback, setRosterFeedback] = useState<Record<string, 'added' | 'error'>>({});
   const [activeTab, setActiveTab] = useState<'units' | 'faction'>('units');
   const [rosterOpen, setRosterOpen] = useState(false);
+  const [sheetOpen, setSheetOpen]   = useState(false);
+  const [compareMode, setCompareMode]   = useState(false);
+  const [compareUnits, setCompareUnits] = useState<UnitType[]>([]);
   const rosterTriggerRef = useRef<HTMLButtonElement>(null);
   const searchInputRef   = useRef<HTMLInputElement>(null);
 
@@ -107,6 +113,14 @@ export default function BuilderPage() {
     onRoleFilter:  (r) => setRoleFilter(r as RoleFilter),
     onClearSearch: () => setSearch(''),
   });
+
+  const handleCompare = (unit: UnitType) => {
+    setCompareUnits(prev =>
+      prev.some(u => u.id === unit.id)
+        ? prev.filter(u => u.id !== unit.id)
+        : prev.length < 3 ? [...prev, unit] : prev,
+    );
+  };
 
   const handleQuickAdd = (unit: UnitType) => {
     const result = addUnit(unit);
@@ -195,24 +209,22 @@ export default function BuilderPage() {
           </div>
         )}
 
-        {/* Mobile army summary bar */}
+        {/* Mobile FAB — army access */}
         {(() => {
           const totalModels = entries.reduce((s, e) => s + e.quantity, 0);
-          const pct = points / 1000;
+          const pct  = points / 1000;
           const over = points > 1000;
-          const ptColour = over || pct >= 0.95 ? 'text-red-400' : pct >= 0.8 ? 'text-amber-400' : 'text-dfa-gold';
+          const ptColour = over || pct >= 0.95 ? 'text-red-300' : pct >= 0.8 ? 'text-amber-300' : 'text-white';
           return (
-            <div className="md:hidden sticky top-0 z-30 bg-dfa-surface border-b border-dfa-border px-4 py-2 flex items-center gap-3 shrink-0">
-              <span className={`font-mono font-bold text-sm ${ptColour}`}>{points}<span className="text-dfa-text-muted font-normal text-xs"> / 1000pts</span></span>
-              <span className="text-dfa-text-muted text-xs">{totalModels} model{totalModels !== 1 ? 's' : ''}</span>
-              <a
-                href="#army-sidebar"
-                onClick={e => { e.preventDefault(); document.getElementById('army-sidebar')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className="ml-auto px-3 py-1 bg-dfa-red hover:bg-dfa-red-bright text-white text-xs font-bold rounded transition-colors"
-              >
-                View Army
-              </a>
-            </div>
+            <button
+              onClick={() => setSheetOpen(true)}
+              className="lg:hidden fixed bottom-6 right-6 z-30 flex items-center gap-2 px-4 py-3 bg-dfa-red hover:bg-dfa-red-bright text-white font-bold rounded-full shadow-xl transition-colors"
+            >
+              <span className={`font-mono text-sm ${ptColour}`}>{points}pts</span>
+              {totalModels > 0 && (
+                <span className="text-xs opacity-75">· {totalModels} model{totalModels !== 1 ? 's' : ''}</span>
+              )}
+            </button>
           );
         })()}
 
@@ -277,7 +289,7 @@ export default function BuilderPage() {
                   </div>
                 </div>
 
-                {/* Sort + advanced filter toggle */}
+                {/* Sort + compare + advanced filter toggle */}
                 <div className="flex items-center gap-2">
                   <ArrowUpDown size={12} className="text-dfa-text-muted shrink-0" />
                   <select
@@ -292,6 +304,16 @@ export default function BuilderPage() {
                     <option value="name-asc">Name A→Z</option>
                     <option value="name-desc">Name Z→A</option>
                   </select>
+                  <button
+                    onClick={() => { setCompareMode(v => !v); if (compareMode) setCompareUnits([]); }}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded border text-xs font-bold transition-colors ${
+                      compareMode
+                        ? 'bg-dfa-gold/10 border-dfa-gold/40 text-dfa-gold'
+                        : 'bg-dfa-surface border-dfa-border text-dfa-text-muted hover:text-dfa-text'
+                    }`}
+                  >
+                    Compare{compareUnits.length > 0 ? ` (${compareUnits.length})` : ''}
+                  </button>
                   <button
                     onClick={() => setShowAdvanced(v => !v)}
                     className={`ml-auto flex items-center gap-1.5 px-3 py-1 rounded border text-xs font-bold transition-colors ${
@@ -358,11 +380,20 @@ export default function BuilderPage() {
                         quantity={entry?.quantity ?? 0}
                         currentPoints={points}
                         recentlyAdded={lastAddedUnitId === unit.id}
+                        compareMode={compareMode}
+                        isComparing={compareUnits.some(c => c.id === unit.id)}
+                        onCompare={handleCompare}
                       />
                     );
                   })}
                 </div>
               )}
+
+              <ComparePanel
+                units={compareUnits}
+                onRemove={id => setCompareUnits(prev => prev.filter(u => u.id !== id))}
+                onClear={() => { setCompareUnits([]); setCompareMode(false); }}
+              />
             </>
           )}
 
@@ -467,8 +498,50 @@ export default function BuilderPage() {
         </div>
       </div>
 
-      {/* ── Army sidebar ────────────────────────────────────────────────── */}
-      <aside id="army-sidebar" className="lg:w-80 xl:w-96 flex flex-col bg-dfa-surface border-t lg:border-t-0 lg:border-l border-dfa-border lg:sticky lg:top-0 lg:h-screen">
+      {/* ── Mobile bottom sheet ─────────────────────────────────────────── */}
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="My Army">
+        <div className="p-4 border-b border-dfa-border space-y-3">
+          <PointsBar current={points} factionColor={faction?.color_primary} />
+          <ValidationChecklist entries={entries} points={points} />
+        </div>
+        <div className="divide-y divide-dfa-border">
+          {entries.length === 0 ? (
+            <p className="text-dfa-text-muted text-sm text-center py-8 px-4">No units added yet.</p>
+          ) : entries.map((entry) => (
+            <div key={entry.id} className="flex items-center gap-3 p-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-dfa-text font-medium truncate">{entry.unit_type.name}</p>
+                <p className="text-xs text-dfa-gold font-mono">{entry.unit_type.points * entry.quantity}pts</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setQuantity(entry.id, entry.quantity - 1)} aria-label={`Remove one ${entry.unit_type.name}`}
+                  className="w-11 h-11 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors">
+                  <Minus size={14} />
+                </button>
+                <span className="w-6 text-center text-sm text-dfa-text font-mono">{entry.quantity}</span>
+                <button onClick={() => addUnit(entry.unit_type)} aria-label={`Add one ${entry.unit_type.name}`}
+                  className="w-11 h-11 rounded border border-dfa-border text-dfa-text-muted hover:text-dfa-text flex items-center justify-center transition-colors">
+                  <Plus size={14} />
+                </button>
+              </div>
+              <button onClick={() => removeUnit(entry.id)} aria-label={`Remove ${entry.unit_type.name}`}
+                className="text-dfa-text-muted hover:text-red-400 transition-colors ml-1">
+                <Trash2 size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="p-4 border-t border-dfa-border">
+          <button onClick={() => { handleSave(); setSheetOpen(false); }} disabled={isSaving || !isDirty}
+            className="w-full flex items-center justify-center gap-2 py-2.5 bg-dfa-red hover:bg-dfa-red-bright disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded transition-colors">
+            <Save size={15} />
+            {isSaving ? 'Saving…' : saved ? 'Saved!' : 'Save Army'}
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* ── Army sidebar (desktop only) ──────────────────────────────────── */}
+      <aside id="army-sidebar" className="hidden lg:w-80 xl:w-96 lg:flex flex-col bg-dfa-surface border-l border-dfa-border lg:sticky lg:top-0 lg:h-screen">
         {/* Fixed header */}
         <div className="shrink-0 bg-dfa-surface p-4 border-b border-dfa-border space-y-3">
           <input
@@ -537,6 +610,12 @@ export default function BuilderPage() {
               </div>
             ))
           )}
+          <UnitSuggestions
+            entries={entries}
+            points={points}
+            allUnits={units ?? []}
+            onAdd={(u) => addUnit(u)}
+          />
         </div>
 
         {/* Save section — always visible at bottom */}
