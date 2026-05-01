@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import type { UnitType, ValidationResult } from '@dfa/types';
+import type { UnitType, UnitRole, ValidationResult } from '@dfa/types';
+
+const ROLE_FALLBACK: Record<UnitRole, string> = {
+  captain: '👑', specialist: '⚡', core: '🛡️',
+};
 import { StatBlock } from './StatBlock';
 import { AbilityList } from './AbilityList';
 import { WeaponTable } from './WeaponTable';
@@ -63,8 +67,8 @@ export function UnitCard({ unit, onAdd, quantity = 0, onSelect, currentPoints }:
               className="w-full h-full object-contain p-2"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center opacity-20">
-              <span className="text-4xl">⚔</span>
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-5xl opacity-25">{ROLE_FALLBACK[unit.role]}</span>
             </div>
           )}
           <span className="absolute top-2 right-2 text-xs font-mono text-dfa-gold font-bold">
